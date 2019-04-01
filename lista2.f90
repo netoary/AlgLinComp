@@ -1,7 +1,7 @@
-program algcomp
+program lista2
     integer n, i, j
     real, allocatable, dimension(:) :: b, x
-    real, allocatable, dimension(:,:) :: a, d, c, at
+    real, allocatable, dimension(:,:) :: a, d, c
 
     ! abertura do arquivo sistema.txt e leitura
     open (1, file='sistema.txt', status='old', action='read')
@@ -30,12 +30,7 @@ program algcomp
 
     call teste(a, d, c, n)
 
-    !call eliminacaoGauss(a, b, x, n)
-    !call eliminacaoGaussJordan(a, b, x, n)
-    call decomposicaoCholesky(a, b, x, n)
-
-    allocate(at(n,n))
-    call transposta(a, at, n)
+    call eliminacaoGaussJordan(a, b, x, n)
 
 
     open(2, file='RESUL.txt', status='replace')
@@ -45,27 +40,37 @@ program algcomp
     write(2, *) (x(i), i=1, n)
     close(2)
 
-end program algcomp
+end program lista2
 
 subroutine retroSubs(a, b, x, n)
     integer :: n, i, j
-    real :: a(n,n), b(n), x(n), soma
+    real :: a(n,n), b(n), x(n), sum
 
     x = 0.0
 
     do i = n, 1, -1
-        soma = 0.0
+        sum = 0.0
         do j = i+1, n
-            soma = soma + a(i,j) * x(j)
+            sum = sum + a(i,j) * x(j)
         end do
-        x(i) = (b(i) - soma)/a(i,i)
+        x(i) = (b(i) - sum)/a(i,i)
     end do
+end subroutine
+
+subroutine powerMethod
+end subroutine
+
+
+subroutine jocobi
+end subroutine
+
+subroutine powerMethod
 end subroutine
 
 subroutine eliminacaoGauss(a, b, x, n)
     integer :: n, i, j, k, pivo, r, aux
     integer :: p(n)
-    real :: a(n,n), b(n), x(n), soma, mult
+    real :: a(n,n), b(n), x(n), sum, mult
 
     x = 0.0
 
@@ -118,6 +123,7 @@ end subroutine
 
 subroutine eliminacaoGaussJordan(a, b, x, n)
     integer :: n, i, j, k
+    integer :: p(n)
     real :: a(n,n), b(n), x(n), mult
 
     x = 0.0
@@ -144,62 +150,6 @@ subroutine eliminacaoGaussJordan(a, b, x, n)
 
 end subroutine
 
-subroutine decomposicaoCholesky(a, b,x, n)
-    integer :: n, i, j, k
-    real :: a(n,n), b(n), x(n), l(n,n), soma, y(n), u(n,n)
-
-    x = 0.0
-    y = 0.0
-
-    do i = 1, n
-        soma = 0.0
-        do k = 1, i-1
-            soma = soma + l(i,k)**2
-        end do
-        l(i,i) = sqrt(a(i,i) - soma)
-        do j = (i+1), n
-            soma = 0.0
-            do k = 1, i-1
-                soma = soma + l(i,k)*l(j,k)
-            end do
-            l(j,i) = (a(i,j) - soma)/l(i,i)
-        end do
-    end do
-
-    do i=1, n !Resolução do sistema Ly=b
-        soma = 0.0
-        do j=1, (i-1)
-            soma = soma + l(i,j)*y(j)
-        end do
-        y(i) = (b(i) - soma)/l(i,i)
-        write(*,*) (y(k), k=1, n)
-    end do
-    write(*,*)
-    write(*,*) (y(j), j=1, n)
-
-    call transposta(l, u, n)
-
-    write(*,*)
-    do i=1, n
-        write(*,*) (l(i, j), j=1, n)
-    end do
-    write(*,*)
-    do i=1, n
-        write(*,*) (u(i, j), j=1, n)
-    end do
-    write(*,*)
-
-    do i=n, 1, -1 !Resolução do sistema Ux=y
-        soma = 0.0
-        do j=(i+1), n
-            soma = soma + u(i,j)*x(j)
-        end do
-        x(i) = (y(i)-soma)/u(i,i)
-        write(*,*) (x(k), k=1, n)
-    end do
-
-end subroutine
-
 subroutine multiplicaMatrizes(a, b, c, n)
     !multiplicação de matrizes quadradas, precisa generalizar?
     integer :: n, i, j, k
@@ -216,18 +166,6 @@ subroutine multiplicaMatrizes(a, b, c, n)
     end do
 end subroutine
 
-subroutine transposta(a, at, n)
-    integer :: n
-    real :: a(n,n), at(n,n)
-
-    do i = 1, n
-        at(i,i) = a(i,i)
-        do j = (i+1), n
-            at(i,j) = a(j,i)
-            at(j,i) = a(i,j)
-        end do
-    end do
-end subroutine
 
 subroutine teste(a, b, c, n)
     !multiplicação de matrizes quadradas, precisa generalizar?
