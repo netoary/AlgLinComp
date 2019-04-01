@@ -172,22 +172,9 @@ subroutine decomposicaoCholesky(a, b,x, n)
             soma = soma + l(i,j)*y(j)
         end do
         y(i) = (b(i) - soma)/l(i,i)
-        write(*,*) (y(k), k=1, n)
     end do
-    write(*,*)
-    write(*,*) (y(j), j=1, n)
 
     call transposta(l, u, n)
-
-    write(*,*)
-    do i=1, n
-        write(*,*) (l(i, j), j=1, n)
-    end do
-    write(*,*)
-    do i=1, n
-        write(*,*) (u(i, j), j=1, n)
-    end do
-    write(*,*)
 
     do i=n, 1, -1 !Resolução do sistema Ux=y
         soma = 0.0
@@ -195,7 +182,6 @@ subroutine decomposicaoCholesky(a, b,x, n)
             soma = soma + u(i,j)*x(j)
         end do
         x(i) = (y(i)-soma)/u(i,i)
-        write(*,*) (x(k), k=1, n)
     end do
 
 end subroutine
