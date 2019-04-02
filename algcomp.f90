@@ -1,6 +1,6 @@
 program algcomp
     integer n, i, j
-    real, allocatable, dimension(:) :: b, x
+    real, allocatable, dimension(:) :: b, x, vamos
     real, allocatable, dimension(:,:) :: a, d, c, at
 
     ! abertura do arquivo sistema.txt e leitura
@@ -13,7 +13,6 @@ program algcomp
     allocate(b(n))
     read(1,*) ( b(i) , i= 1 , n)
     close(1)
-
 
     allocate(d(n,n))
     d(1,1) = 1.0
@@ -200,6 +199,18 @@ subroutine multiplicaMatrizes(a, b, c, n)
             end do
         end do
     end do
+end subroutine
+
+subroutine multiplicaVetor(a, b, c, n)
+    !multiplicação de vetores de tamanho n
+    integer :: n, i, j, k, m
+    real :: a(n), b(n), c
+
+    c = 0.0
+    do j=1, n
+        c = c + a(j)*b(j)
+    end do
+
 end subroutine
 
 subroutine transposta(a, at, n)
