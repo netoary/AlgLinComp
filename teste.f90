@@ -1,12 +1,9 @@
-! FALTA
-! prepare as mesmas para indicar casos onde as decomposições não são possíveis
-! na decomposicaoLU e decomposicaoCholesky
-
-program algcomp
+program teste
+    implicit none
     integer :: n, m, i, j
     real :: det
-    real, allocatable, dimension(:) :: b, x
-    real, allocatable, dimension(:,:) :: a, d, c, at, aInversa
+    real, allocatable, dimension(:) :: b, x, x1, x2, x3, x4, x5, x6
+    real, allocatable, dimension(:,:) :: a, aOriginal, aInversa
 
     ! abertura do arquivo sistema.txt e leitura
     open (1, file='sistema.txt', status='old', action='read')
@@ -19,42 +16,63 @@ program algcomp
     read(1,*) ( b(i) , i= 1 , n)
     close(1)
 
-    allocate(d(n,n))
-    d(1,1) = 1.0
-    d(1,2) = 0.0
-    d(1,3) = 0.0
-    d(2,1) = 0.0
-    d(2,2) = 1.0
-    d(2,3) = 0.0
-    d(3,1) = 0.0
-    d(3,2) = 0.0
-    d(3,3) = 1.0
-    allocate(c(n,n))
+    allocate(aOriginal(n,n))
+    aOriginal = a
+
     allocate(x(n))
     x = 0.0
+    allocate(x1(n))
+    x1 = 0.0
+    allocate(x2(n))
+    x2 = 0.0
+    allocate(x3(n))
+    x3 = 0.0
+    allocate(x4(n))
+    x4 = 0.0
+    allocate(x5(n))
+    x5 = 0.0
+    allocate(x6(n))
+    x6 = 0.0
     allocate(aInversa(n,n))
 
-    !call eliminacaoGauss(a, b, x, n)
-    !call eliminacaoGaussJordan(a, b, x, n)
-    !call decomposicaoLU(a, b, x, n)
-    !call decomposicaoCholesky(a, b, x, n)
-    !call jacobi(a, b, x, n)
-    !call GaussSeidel(a, b, x, n)
-    !call inversa(a, aInversa, n)
+    call eliminacaoGauss(a, b, x1, n)
+    call eliminacaoGaussJordan(a, b, x2, n)
+    call decomposicaoLU(a, b, x3, n)
+    call decomposicaoCholesky(a, b, x4, n)
+    call jacobi(a, b, x5, n)
+    call GaussSeidel(a, b, x6, n)
+    call inversa(a, aInversa, n)
     call determinante(a, n, det)
-
-    allocate(at(n,n))
-    call transposta(a, at, n)
 
     open(2, file='RESUL.txt', status='replace')
     do i=1, n
-        write(2,*) (a(i, j), j=1, n)
+        write(2,*) (aOriginal(i, j), j=1, n)
     end do
-    write(2, *) (x(i), i=1, n)
+    write(2, *)
+    write(2, *) "eliminacaoGauss"
+    write(2, *) (x1(i), i=1, n)
+    write(2, *)
+    write(2, *) "eliminacaoGaussJordan"
+    write(2, *) (x2(i), i=1, n)
+    write(2, *)
+    write(2, *) "decomposicaoLU"
+    write(2, *) (x3(i), i=1, n)
+    write(2, *)
+    write(2, *) "decomposicaoCholesky"
+    write(2, *) (x4(i), i=1, n)
+    write(2, *)
+    write(2, *) "jacobi"
+    write(2, *) (x5(i), i=1, n)
+    write(2, *)
+    write(2, *) "GaussSeidel"
+    write(2, *) (x6(i), i=1, n)
+    write(2, *)
+
     write(2, *) det
     close(2)
 
-end program algcomp
+
+end program teste
 
 subroutine retroSubs(a, b, x, n)
     integer :: n, i, j
