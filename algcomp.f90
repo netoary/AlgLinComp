@@ -1,5 +1,6 @@
 program algcomp
-    integer n, i, j
+    integer :: n, i, j
+    real :: det
     real, allocatable, dimension(:) :: b, x
     real, allocatable, dimension(:,:) :: a, d, c, at, aInversa
 
@@ -31,11 +32,12 @@ program algcomp
 
     !call eliminacaoGauss(a, b, x, n)
     !call eliminacaoGaussJordan(a, b, x, n)
-    call decomposicaoLU(a, b, x, n)
+    !call decomposicaoLU(a, b, x, n)
     !call decomposicaoCholesky(a, b, x, n)
     !call jacobi(a, b, x, n)
     !call GaussSeidel(a, b, x, n)
     !call inversa(a, aInversa, n)
+    call determinante(a, n, det)
 
     allocate(at(n,n))
     call transposta(a, at, n)
@@ -45,6 +47,7 @@ program algcomp
         write(2,*) (a(i, j), j=1, n)
     end do
     write(2, *) (x(i), i=1, n)
+    write(2, *) det
     close(2)
 
 end program algcomp
@@ -212,6 +215,19 @@ subroutine decomposicaoLU(a, b, x, n)
         x(i) = (y(i)-soma)/a(i,i)
     end do
 
+end subroutine
+
+subroutine determinante(a, n, det)
+    integer :: n, i
+    real :: a(n,n), b(n), x(n), det
+
+    b = 0.0
+    x = 0.0
+    det = 1.0
+    call decomposicaoLU(a, b, x, n)
+    do i=1, n
+        det = det * a(i,i)
+    end do
 end subroutine
 
 subroutine decomposicaoCholesky(a, b,x, n)
