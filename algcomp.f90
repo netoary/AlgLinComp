@@ -1,6 +1,6 @@
 program algcomp
     integer n, i, j
-    real, allocatable, dimension(:) :: b, x, vamos
+    real, allocatable, dimension(:) :: b, x
     real, allocatable, dimension(:,:) :: a, d, c, at
 
     ! abertura do arquivo sistema.txt e leitura
@@ -31,7 +31,8 @@ program algcomp
 
     !call eliminacaoGauss(a, b, x, n)
     !call eliminacaoGaussJordan(a, b, x, n)
-    call decomposicaoCholesky(a, b, x, n)
+    !call decomposicaoCholesky(a, b, x, n)
+    call jacobi(a, b, x, n)
 
     allocate(at(n,n))
     call transposta(a, at, n)
@@ -182,6 +183,42 @@ subroutine decomposicaoCholesky(a, b,x, n)
         end do
         x(i) = (y(i)-soma)/u(i,i)
     end do
+
+end subroutine
+
+subroutine jacobi(a, b, x, n)
+    integer :: n, i, j, k
+    real :: a(n,n), b(n), xZero(n), tolerancia, r, xNovo(n), xNovoT, x(n), xT, soma
+
+    r = 100.0
+    tolerancia = 10**(-5)
+    xZero = 1.0
+    !xZero(1) = 1.0
+
+    do while (r > tolerancia)
+        do i=1, n
+            soma = 0.0
+            do j=1, n
+                if (j /= i) then
+                    soma = soma + a(i,j)*xZero(j)
+                end if
+            end do
+            xNovo(i) = (b(i) - soma) / a(i,i)
+        end do
+
+        xNovoT = 0.0
+        call multiplicaVetor(xNovo, xNovo, xNovoT, n)
+        xNovoT = sqrt(xNovoT)
+
+        x = xNovo - xZero
+        call multiplicaVetor(x, x, xT, n)
+        xT = sqrt(xT)
+
+        r = xT / xNovoT
+        xZero = xNovo
+    end do
+
+    x = xZero
 
 end subroutine
 
