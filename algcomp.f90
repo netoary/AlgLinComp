@@ -1,7 +1,7 @@
 program algcomp
     integer n, i, j
     real, allocatable, dimension(:) :: b, x
-    real, allocatable, dimension(:,:) :: a, d, c, at
+    real, allocatable, dimension(:,:) :: a, d, c, at, aInversa
 
     ! abertura do arquivo sistema.txt e leitura
     open (1, file='sistema.txt', status='old', action='read')
@@ -26,21 +26,22 @@ program algcomp
     d(3,3) = 1.0
     allocate(c(n,n))
     allocate(x(n))
-
-    call teste(a, d, c, n)
+    x = 0.0
+    allocate(aInversa(n,n))
 
     !call eliminacaoGauss(a, b, x, n)
     !call eliminacaoGaussJordan(a, b, x, n)
     !call decomposicaoCholesky(a, b, x, n)
     !call jacobi(a, b, x, n)
-    call GaussSeidel(a, b, x, n)
+    !call GaussSeidel(a, b, x, n)
+    call inversa(a, aInversa, n)
 
     allocate(at(n,n))
     call transposta(a, at, n)
 
     open(2, file='RESUL.txt', status='replace')
     do i=1, n
-        write(2,*) (a(i, j), j=1, n)
+        write(2,*) (aInversa(i, j), j=1, n)
     end do
     write(2, *) (x(i), i=1, n)
     close(2)
@@ -261,6 +262,59 @@ subroutine GaussSeidel(a, b, x, n)
     x = xZero
 end subroutine
 
+subroutine inversa(a, aInversa, n)
+    integer :: n, i, j, k, l
+    real :: a(n,n), b(n,n), x(n), mult, aInversa(n,n)
+
+    x = 0.0
+    aInversa = 0.0
+
+    do i=1, n
+        do j=1, n
+            if (i==j) then
+                b(i,j) = 1.0
+            else
+                b(i,j) = 0.0
+            end if
+        end do
+    end do
+
+    do k = 1, (n-1)
+        do i=(k+1), n !eliminação ate chegar numa matriz triangular superior
+            mult = a(i,k)/a(k,k)
+            a(i,k) = a(i,k) - mult * a(k,k)
+            do j=(k+1), n
+                a(i,j) = a(i,j) - mult*a(k,j)
+            end do
+            do l=1, n
+                b(l,i) = b(l,i) - mult * b(l,k)
+            end do
+        end do
+    end do
+    do k = n, 2, -1
+        do i=(k-1), 1, -1 !eliminação ate chegar numa matriz diagonal
+            mult = a(i,k)/a(k,k)
+            a(i,k) = a(i,k) - mult * a(k,k)
+            do j=(k-1), 1, -1
+                a(i,j) = a(i,j) - mult*a(k,j)
+            end do
+            do l=n, 1, -1
+                b(l,i) = b(l,i) - mult * b(l,k)
+            end do
+        end do
+    end do
+    do i=1, n
+        if (a(i,i) /= 0.0) then
+            do j=1, n
+                b(j,i) = b(j,i)/a(i,i)
+            end do
+        end if
+    end do
+
+    aInversa = b
+
+end subroutine
+
 subroutine multiplicaMatrizes(a, b, c, n)
     !multiplicação de matrizes quadradas, precisa generalizar?
     integer :: n, i, j, k
@@ -300,12 +354,4 @@ subroutine transposta(a, at, n)
             at(j,i) = a(i,j)
         end do
     end do
-end subroutine
-
-subroutine teste(a, b, c, n)
-    !multiplicação de matrizes quadradas, precisa generalizar?
-    integer :: n, i, j, k
-    real :: a(n,n), b(n,n), c(n,n)
-
-    call multiplicaMatrizes(a, b, c, n)
 end subroutine
