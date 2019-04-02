@@ -31,17 +31,18 @@ program algcomp
 
     !call eliminacaoGauss(a, b, x, n)
     !call eliminacaoGaussJordan(a, b, x, n)
+    call decomposicaoLU(a, b, x, n)
     !call decomposicaoCholesky(a, b, x, n)
     !call jacobi(a, b, x, n)
     !call GaussSeidel(a, b, x, n)
-    call inversa(a, aInversa, n)
+    !call inversa(a, aInversa, n)
 
     allocate(at(n,n))
     call transposta(a, at, n)
 
     open(2, file='RESUL.txt', status='replace')
     do i=1, n
-        write(2,*) (aInversa(i, j), j=1, n)
+        write(2,*) (a(i, j), j=1, n)
     end do
     write(2, *) (x(i), i=1, n)
     close(2)
@@ -141,6 +142,74 @@ subroutine eliminacaoGaussJordan(a, b, x, n)
         if (a(i,i) /= 0.0) then
             x(i) = b(i)/a(i,i)
         end if
+    end do
+
+end subroutine
+
+subroutine decomposicaoLU(a, b, x, n)
+    integer :: n, i, j, k, pivo, r, aux
+    integer :: p(n)
+    real :: a(n,n), b(n), x(n), soma, mult, y(n)
+
+
+    x = 0.0
+
+    do i=1, n
+        p(i) = i
+    end do
+
+    do k = 1, (n-1)
+        pivo = a(k,k)
+        r = k
+        if (pivo == 0) then
+            do i= k+1, n
+                if(a(i,k)==0) then
+                    if (i == n) then
+                        open(2, file='RESUL.txt', status='replace')
+                            write(2,*) 'A matriz A é singular.'
+                        close(2)
+                        stop 'A matriz A é singular.'
+                    end if
+                else
+                    r = i
+                end if
+            end do
+        end if
+
+        if (r /= k) then
+            aux = p(k)
+            p(k) = p(r)
+            p(r) = aux
+            do j=1, n !troca linha r por linha k
+                aux = a(k,j)
+                a(k,j) = a(r,j)
+                a(r,j) = aux
+            end do
+        end if
+
+        do i=(k+1), n !eliminação
+            mult = a(i,k)/a(k,k)
+            a(i,k) = mult
+            do j=(k+1), n
+                a(i,j) = a(i,j) - mult*a(k,j)
+            end do
+        end do
+    end do
+
+     do i=1, n !Resolução do sistema Ly=c
+        soma = 0
+        do j=1, (i-1)
+            soma = soma + a(i,j)*y(j)
+        end do
+        y(i) = b(i) - soma
+    end do
+
+    do i=n, 1, -1 !Resolução do sistema Ux=y
+        soma = 0
+        do j=(i+1), n
+            soma = soma + a(i,j)*x(j)
+        end do
+        x(i) = (y(i)-soma)/a(i,i)
     end do
 
 end subroutine
