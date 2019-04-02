@@ -1,3 +1,7 @@
+! FALTA
+! prepare as mesmas para indicar casos onde as decomposições não são possíveis
+! na decomposicaoLU e decomposicaoCholesky
+
 program algcomp
     integer :: n, i, j
     real :: det
