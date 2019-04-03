@@ -9,7 +9,7 @@ program algcomp
     real, allocatable, dimension(:,:) :: a, d, c, at, aInversa
 
     ! abertura do arquivo sistema.txt e leitura
-    open (1, file='sistema.txt', status='old', action='read')
+    open (1, file='sistema4.txt', status='old', action='read')
     read(1,*) n, m
     allocate(a(n,m))
     do i=1, m
@@ -36,12 +36,12 @@ program algcomp
 
     !call eliminacaoGauss(a, b, x, n)
     !call eliminacaoGaussJordan(a, b, x, n)
-    !call decomposicaoLU(a, b, x, n)
+    call decomposicaoLU(a, b, x, n)
     !call decomposicaoCholesky(a, b, x, n)
     !call jacobi(a, b, x, n)
     !call GaussSeidel(a, b, x, n)
     !call inversa(a, aInversa, n)
-    call determinante(a, n, det)
+    !call determinante(a, n, det)
 
     allocate(at(n,n))
     call transposta(a, at, n)
@@ -221,32 +221,35 @@ subroutine decomposicaoLU(a, b, x, n)
 
 end subroutine
 
-subroutine determinante(a, n, det)
-    integer :: n, i
-    real :: a(n,n), b(n), x(n), det
-
-    b = 0.0
-    x = 0.0
-    det = 1.0
-    call decomposicaoLU(a, b, x, n)
-    do i=1, n
-        det = det * a(i,i)
-    end do
-end subroutine
-
 subroutine decomposicaoCholesky(a, b,x, n)
     integer :: n, i, j, k
-    real :: a(n,n), b(n), x(n), l(n,n), soma, y(n), u(n,n)
+    real :: a(n,n), a_transposta(n,n), b(n), x(n), l(n,n), soma, y(n), u(n,n), a_soma
 
     x = 0.0
     y = 0.0
+
+    call transposta(a, a_transposta, n)
+
+    if (.not.all(a.EQ.a_transposta)) then
+        open(2, file='RESUL.txt', status='replace')
+        write(2,*) 'A matriz A não é simétrica.'
+        close(2)
+        stop 'A matriz A não é simétrica.'
+    end if
 
     do i = 1, n
         soma = 0.0
         do k = 1, i-1
             soma = soma + l(i,k)**2
         end do
-        l(i,i) = sqrt(a(i,i) - soma)
+        a_soma = a(i,i) - soma
+        if (a_soma < 0) then
+            open(2, file='RESUL.txt', status='replace')
+            write(2,*) 'A matriz A não é positiva definida.'
+            close(2)
+            stop 'A matriz A não é positiva definida.'
+        end if
+        l(i,i) = sqrt(a_soma)
         do j = (i+1), n
             soma = 0.0
             do k = 1, i-1
@@ -274,6 +277,19 @@ subroutine decomposicaoCholesky(a, b,x, n)
         x(i) = (y(i)-soma)/u(i,i)
     end do
 
+end subroutine
+
+subroutine determinante(a, n, det)
+    integer :: n, i
+    real :: a(n,n), b(n), x(n), det
+
+    b = 0.0
+    x = 0.0
+    det = 1.0
+    call decomposicaoLU(a, b, x, n)
+    do i=1, n
+        det = det * a(i,i)
+    end do
 end subroutine
 
 subroutine jacobi(a, b, x, n)
