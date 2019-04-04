@@ -6,7 +6,7 @@ program teste
     real, allocatable, dimension(:,:) :: a, aOriginal, aInversa
 
     ! abertura do arquivo sistema.txt e leitura
-    open (1, file='sistema.txt', status='old', action='read')
+    open (1, file='sistema4.txt', status='old', action='read')
     read(1,*) n, m
     allocate(a(n,m))
     do i=1, m
