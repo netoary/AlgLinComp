@@ -39,7 +39,7 @@ program teste
     call eliminacaoGaussJordan(a, b, x2, n)
     call decomposicaoLU(a, b, x3, n)
     call decomposicaoCholesky(a, b, x4, n)
-    call jacobi(a, b, x5, n)
+    call interativoJacobi(a, b, x5, n)
     call GaussSeidel(a, b, x6, n)
     call inversa(a, aInversa, n)
     call determinante(a, n, det)

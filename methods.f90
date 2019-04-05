@@ -208,7 +208,8 @@ subroutine decomposicaoCholesky(a, b,x, n)
         end do
         y(i) = (b(i) - soma)/l(i,i)
     end do
-
+    write(*,*) l
+    write(*,*)
     call transposta(l, u, n)
 
     do i=n, 1, -1 !Resolução do sistema Ux=y
@@ -218,6 +219,7 @@ subroutine decomposicaoCholesky(a, b,x, n)
         end do
         x(i) = (y(i)-soma)/u(i,i)
     end do
+    write (*,*) u
 
 end subroutine
 
@@ -234,7 +236,7 @@ subroutine determinante(a, n, det)
     end do
 end subroutine
 
-subroutine jacobi(a, b, x, n)
+subroutine interativoJacobi(a, b, x, n)
     integer :: n, i, j, k
     real :: a(n,n), b(n), xZero(n), tolerancia, r, xNovo(n), xNovoT, x(n), xT, soma
 
@@ -394,7 +396,7 @@ subroutine multiplicaVetorMatriz(a, b, c, n)
     !multiplicação de vetores de tamanho n
     integer :: n, i, j
     real :: a(n, n), b(n), c(n)
-    
+
     c = 0
     do i=1, n
         do j=1, n
@@ -428,7 +430,7 @@ subroutine powerMethod(a, x, n, tol, lambda)
     do while(r >= tol)
         call multiplicaVetorMatriz(a, x, y, n)
         !y = MATMUL(a, x)
-        
+
         lambda = y(1)
         do i = 2, n
             x(i) = y(i) / lambda
@@ -447,13 +449,28 @@ subroutine powerMethod(a, x, n, tol, lambda)
 end subroutine
 
 
-subroutine jocobi
-end subroutine
+subroutine jocobi(a, x, n, tol, lambda)
+    integer :: n, i, j, k, tol, vi, vj
+    real :: a(n,n), tol, x(n,n), lambda(n,n), maior
 
-subroutine teste(a, b, c, n)
-    !multiplicação de matrizes quadradas, precisa generalizar?
-    integer :: n, i, j, k
-    real :: a(n,n), b(n,n), c(n,n)
+    x = 0.0
+    do i=1, n
+        x(i,i) = 1.0
+    end do
 
-    call multiplicaMatrizes(a, b, c, n)
+    r = tol + 1
+    do while(r >= tol)
+        !indentificar maior elemento fora da diagonal
+        maior = 0.0
+        do i=1, n
+            do j=(i+1), n
+                if (abs(a(i,j)) >= maior)
+                    maior = abs(a(i,j))
+                    vi = i
+                    vj = j
+            end do
+        end do
+        ! FALTA 2.2, 3 e 4 do slide do professor
+        ! PREGUICA DE PENSAR NO ALGORITMO DE 2.2
+    end do
 end subroutine
