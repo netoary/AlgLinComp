@@ -37,9 +37,9 @@ program algcomp
 
     !call eliminacaoGauss(a, b, x, n)
     !call eliminacaoGaussJordan(a, b, x, n)
-    call decomposicaoLU(a, b, x, n)
-    !call decomposicaoCholesky(a, b, x, n)
-    !call jacobi(a, b, x, n)
+    !call decomposicaoLU(a, b, x, n)
+    call decomposicaoCholesky(a, b, x, n)
+    !call interativoJacobi(a, b, x, n)
     !call GaussSeidel(a, b, x, n)
     !call inversa(a, aInversa, n)
     !call determinante(a, n, det)
