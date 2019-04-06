@@ -459,7 +459,7 @@ subroutine identidade(a, n)
 end subroutine
 
 
-subroutine jocobi(a, x, n, tol, lambda)
+subroutine jacobi(a, x, n, tol, lambda)
     integer :: n, i, j, k, iMax, jMax
     real :: a(n,n), p(n, n), pT(n,n), x(n, n), lambda(n), tol, phi
     logical :: done
@@ -539,27 +539,5 @@ subroutine jocobi(a, x, n, tol, lambda)
     do i = 1, n
         lambda(i) = a(i, i)
 
-    end do
-end subroutine
-
-subroutine teste(a, b, c, n)
-    !multiplicação de matrizes quadradas, precisa generalizar?
-    integer :: n, i, j, k
-    real :: a(n,n), b(n,n), c(n,n)
-
-    r = tol + 1
-    do while(r >= tol)
-        !indentificar maior elemento fora da diagonal
-        maior = 0.0
-        do i=1, n
-            do j=(i+1), n
-                if (abs(a(i,j)) >= maior)
-                    maior = abs(a(i,j))
-                    vi = i
-                    vj = j
-            end do
-        end do
-        ! FALTA 2.2, 3 e 4 do slide do professor
-        ! PREGUICA DE PENSAR NO ALGORITMO DE 2.2
     end do
 end subroutine

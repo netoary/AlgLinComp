@@ -27,7 +27,7 @@ implicit none
     x = 0
     lambda = 0
     !call powerMethod(a, x, n, tolerance, lambda(1))
-    call jocobi(a, x, n, tolerance, lambda)
+    call jacobi(a, x, n, tolerance, lambda)
 
     open(2, file='RESUL.txt', status='replace')
     do i=1, n
