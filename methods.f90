@@ -442,12 +442,102 @@ subroutine powerMethod(a, x, n, tol, lambda)
         print*,""
 
         k = k + 1
-        call sleep(1)
+        !call sleep(1)
+    end do
+end subroutine
+
+subroutine identidade(a, n)
+    integer :: n, i
+    real :: a(n,n)
+
+    a = 0
+    do i = 1, n
+        a(i, i) = 1
     end do
 end subroutine
 
 
-subroutine jocobi
+subroutine jocobi(a, x, n, tol, lambda)
+    integer :: n, i, j, k, iMax, jMax
+    real :: a(n,n), p(n, n), pT(n,n), x(n, n), lambda(n), tol, phi
+    logical :: done
+
+    k = 0
+    PI=4.D0*DATAN(1.D0)
+
+    call identidade(x, n)
+
+    do while (.true.)
+        done = .true.
+        aMax = 0
+        p = 0
+        do i = 1, n
+            do j = 1, n
+                if (i == j) then
+                    p(i, j) = 1
+                    cycle
+                end if
+
+                if (done .and. abs(a(i, j)) > tol) then
+                    done = .false.
+                end if
+
+                p(i, j) = 0
+                if (abs(a(i, j)) > abs(a(iMax, jMax))) then
+                    iMax = i
+                    jMax = j
+                end if
+            end do
+        end do 
+        
+        if(done) then
+            exit
+        end if
+
+        if (a(iMax, iMax) /= a(jMax, jMax)) then
+            phi = atan((2 * a(iMax, jMax)) / (a(iMax, iMax) - a(jMax, jMax))) / 2
+        else
+            phi = PI/4
+        end if
+        
+        p(iMax, jMax) = -sin(phi)
+        p(jMax, iMax) = sin(phi)
+        
+        p(iMax, iMax) = cos(phi)
+        p(jMax, jMax) = cos(phi)
+        
+
+        print*, "iMax = ", iMax
+        print*, "jMax = ", jMax
+        print*, "aMax = ", aMax
+        print*, "phi(", k, ") = ", phi
+        print*, "a(", k, ") = ", a
+        print*, "x(", k, ") = ", x
+        print*, "p(", k, ") = ", p
+
+        call transposta(p, pT, n)
+
+        a = matmul(a, p)
+        a = matmul(pT, a)
+        x = matmul(x, p)
+        !call multiplicaMatrizes(a, p, a, n)
+        !call multiplicaMatrizes(pT, a, a, n)
+        !call multiplicaMatrizes(x, p, x, n)
+
+        
+        print*, "a(", k+1, ") = ", a
+        print*, "x(", k+1, ") = ", x
+        print*,""
+        !call sleep(1)
+
+        
+        k = k + 1
+    end do
+
+    do i = 1, n
+        lambda(i) = a(i, i)
+
+    end do
 end subroutine
 
 subroutine teste(a, b, c, n)

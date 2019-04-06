@@ -3,11 +3,11 @@ include 'methods.f90'
 program eigenvalues
 implicit none
     integer :: n, m, i, j
-    real, allocatable, dimension(:) :: x, lambda
-    real, allocatable, dimension(:,:) :: a
+    real, allocatable, dimension(:) :: lambda
+    real, allocatable, dimension(:,:) :: a, x
     real :: tolerance
 
-    open (1, file='sistema_2_1.txt', status='old', action='read')
+    open (1, file='sistema_2_2.txt', status='old', action='read')
 
     read(1,*) n, m
     allocate(a(n,m))
@@ -21,16 +21,21 @@ implicit none
     close(1)
 
 
-    allocate(x(n))
+    allocate(x(n, n))
     allocate(lambda(n))
+
+    x = 0
     lambda = 0
-    call powerMethod(a, x, n, tolerance, lambda(1))
+    !call powerMethod(a, x, n, tolerance, lambda(1))
+    call jocobi(a, x, n, tolerance, lambda)
 
     open(2, file='RESUL.txt', status='replace')
     do i=1, n
         write(2,*) (a(i, j), j=1, n)
     end do
-    write(2, *) (x(i), i=1, n)
+    do i=1, n
+        write(2,*) (x(i, j), j=1, n)
+    end do
     write(2, *) (lambda(i), i=1, n)
     write(2, *) tolerance
     close(2)
