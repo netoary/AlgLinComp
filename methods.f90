@@ -431,8 +431,17 @@ end subroutine
 
 subroutine jacobi(a, x, n, tol, lambda)
     integer :: n, i, j, k, iMax, jMax
-    real :: a(n,n), p(n, n), pT(n,n), x(n, n), lambda(n), tol, phi
+    real :: a(n,n), a_transposta(n,n), p(n, n), pT(n,n), x(n, n), lambda(n), tol, phi
     logical :: done
+
+    call transposta(a, a_transposta, n)
+
+    if (.not.all(a.EQ.a_transposta)) then
+        open(2, file='RESUL.txt', status='replace')
+        write(2,*) 'A matriz A não é simétrica.'
+        close(2)
+        stop 'A matriz A não é simétrica.'
+    end if
 
     k = 0
     PI=4.D0*DATAN(1.D0)
