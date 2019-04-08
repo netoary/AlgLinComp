@@ -364,22 +364,6 @@ subroutine inversa(a, aInversa, n)
 
 end subroutine
 
-subroutine multiplicaMatrizes(a, b, c, n)
-    !multiplicação de matrizes quadradas, precisa generalizar?
-    integer :: n, i, j, k
-    real :: a(n,n), b(n,n), c(n,n)
-
-    c = 0.0
-
-    do i=1, n
-        do j=1, n
-            do k=1, n
-                c(i,j) = c(i,j) + a(i,k)*b(k,j)
-            end do
-        end do
-    end do
-end subroutine
-
 subroutine multiplicaVetor(a, b, c, n)
     !multiplicação de vetores de tamanho n
     integer :: n, i, j, k, m
@@ -390,19 +374,6 @@ subroutine multiplicaVetor(a, b, c, n)
         c = c + a(j)*b(j)
     end do
 
-end subroutine
-
-subroutine multiplicaVetorMatriz(a, b, c, n)
-    !multiplicação de vetores de tamanho n
-    integer :: n, i, j
-    real :: a(n, n), b(n), c(n)
-
-    c = 0
-    do i=1, n
-        do j=1, n
-            c(i) = c(i) + (a(i,j) * b(j))
-        end do
-    end do
 end subroutine
 
 subroutine transposta(a, at, n)
@@ -428,8 +399,7 @@ subroutine powerMethod(a, x, n, tol, lambda)
     k = 1
 
     do while(r >= tol)
-        call multiplicaVetorMatriz(a, x, y, n)
-        !y = MATMUL(a, x)
+        y = MATMUL(a, x)
 
         lambda = y(1)
         do i = 2, n
@@ -469,6 +439,7 @@ subroutine jacobi(a, x, n, tol, lambda)
 
     call identidade(x, n)
 
+    done = .false.
     do while (.true.)
         done = .true.
         aMax = 0
@@ -485,7 +456,8 @@ subroutine jacobi(a, x, n, tol, lambda)
                 end if
 
                 p(i, j) = 0
-                if (abs(a(i, j)) > abs(a(iMax, jMax))) then
+                if (abs(a(i, j)) > abs(aMax)) then
+                    aMax = a(i, j)
                     iMax = i
                     jMax = j
                 end if
@@ -522,11 +494,7 @@ subroutine jacobi(a, x, n, tol, lambda)
         a = matmul(a, p)
         a = matmul(pT, a)
         x = matmul(x, p)
-        !call multiplicaMatrizes(a, p, a, n)
-        !call multiplicaMatrizes(pT, a, a, n)
-        !call multiplicaMatrizes(x, p, x, n)
 
-        
         print*, "a(", k+1, ") = ", a
         print*, "x(", k+1, ") = ", x
         print*,""
@@ -538,6 +506,5 @@ subroutine jacobi(a, x, n, tol, lambda)
 
     do i = 1, n
         lambda(i) = a(i, i)
-
     end do
 end subroutine
