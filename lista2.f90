@@ -1,7 +1,7 @@
 include 'methods.f90'
 
 program lista2
-    integer n, i, j
+    integer n, m, i, j
     real, allocatable, dimension(:) :: b, x
     real, allocatable, dimension(:,:) :: a, d, c
     real lambda

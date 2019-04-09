@@ -450,7 +450,7 @@ end subroutine
 
 
 subroutine jocobi(a, x, n, tol, lambda)
-    integer :: n, i, j, k, tol, vi, vj
+    integer :: n, i, j, k, vi, vj
     real :: a(n,n), tol, x(n,n), lambda(n,n), maior
 
     x = 0.0
@@ -464,13 +464,68 @@ subroutine jocobi(a, x, n, tol, lambda)
         maior = 0.0
         do i=1, n
             do j=(i+1), n
-                if (abs(a(i,j)) >= maior)
+                if (abs(a(i,j)) >= maior) then
                     maior = abs(a(i,j))
                     vi = i
                     vj = j
+                end if
             end do
         end do
         ! FALTA 2.2, 3 e 4 do slide do professor
         ! PREGUICA DE PENSAR NO ALGORITMO DE 2.2
     end do
+end subroutine
+
+subroutine minimosQuadrados(b, x, y, n)
+    integer n, i, j
+    real b(2), x(n), y(n), a(2,2), soma, c(2), aI(2,2), det
+
+    b = 0.0
+    soma = 0.0
+
+    do i=1, n
+        soma = soma + 1
+    end do
+    a(1,1) = soma
+
+    soma = 0.0
+    do i=1, n
+        soma = soma + x(i)
+    end do
+    a(2,1) = soma
+    a(1,2) = soma
+
+    soma = 0.0
+    do i=1, n
+        soma = soma + (x(i))**2
+    end do
+    a(2,2) = soma
+
+    soma = 0.0
+    do i=1, n
+        soma = soma + y(i)
+    end do
+    c(1) = soma
+
+    soma = 0.0
+    do i=1, n
+        soma = soma + x(i)*y(i)
+    end do
+    c(2) = soma
+
+    det = a(1,1)*a(2,2) - (a(1,2)*a(2,1))
+    if (det == 0) then
+        STOP
+    end if
+    aI(1,1) = a(2,2)/det
+    aI(1,2) = -a(1,2)/det
+    aI(2,1) = -a(2,1)/det
+    aI(2,2) = a(1,1)/det
+
+    call multiplicaVetorMatriz(aI, c, b, 2)
+    write(*,*) a
+    write(*,*) c
+    write(*,*) b
+
+
 end subroutine
