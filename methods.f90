@@ -470,8 +470,8 @@ subroutine jacobi(a, x, n, tol, lambda)
                     jMax = j
                 end if
             end do
-        end do 
-        
+        end do
+
         if(done) then
             exit
         end if
@@ -481,13 +481,13 @@ subroutine jacobi(a, x, n, tol, lambda)
         else
             phi = PI/4
         end if
-        
+
         p(iMax, jMax) = -sin(phi)
         p(jMax, iMax) = sin(phi)
-        
+
         p(iMax, iMax) = cos(phi)
         p(jMax, jMax) = cos(phi)
-        
+
 
         print*, "iMax = ", iMax
         print*, "jMax = ", jMax
@@ -508,9 +508,66 @@ subroutine jacobi(a, x, n, tol, lambda)
         print*,""
         !call sleep(1)
 
-        
+
         k = k + 1
     end do
+
+    do i = 1, n
+        lambda(i) = a(i, i)
+    end do
+end subroutine
+
+subroutine minimosQuadrados(b, x, y, n)
+    integer n, i, j
+    real b(2), x(n), y(n), a(2,2), soma, c(2), aI(2,2), det
+
+    b = 0.0
+    soma = 0.0
+
+    do i=1, n
+        soma = soma + 1
+    end do
+    a(1,1) = soma
+
+    soma = 0.0
+    do i=1, n
+        soma = soma + x(i)
+    end do
+    a(2,1) = soma
+    a(1,2) = soma
+
+    soma = 0.0
+    do i=1, n
+        soma = soma + (x(i))**2
+    end do
+    a(2,2) = soma
+
+    soma = 0.0
+    do i=1, n
+        soma = soma + y(i)
+    end do
+    c(1) = soma
+
+    soma = 0.0
+    do i=1, n
+        soma = soma + x(i)*y(i)
+    end do
+    c(2) = soma
+
+    det = a(1,1)*a(2,2) - (a(1,2)*a(2,1))
+    if (det == 0) then
+        STOP
+    end if
+    aI(1,1) = a(2,2)/det
+    aI(1,2) = -a(1,2)/det
+    aI(2,1) = -a(2,1)/det
+    aI(2,2) = a(1,1)/det
+
+    call multiplicaVetorMatriz(aI, c, b, 2)
+    write(*,*) a
+    write(*,*) c
+    write(*,*) b
+
 
     do i = 1, n
         lambda(i) = a(i, i)
