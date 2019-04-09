@@ -30,16 +30,20 @@ implicit none
     call jacobi(a, x, n, tolerance, lambda)
 
     open(2, file='RESUL.txt', status='replace')
+    write(2, *) "A"
     do i=1, n
         write(2,*) (a(i, j), j=1, n)
     end do
+    write(2, *) "X"
     do i=1, n
         write(2,*) (x(i, j), j=1, n)
     end do
+    write(2, *) "lambda"
     write(2, *) (lambda(i), i=1, n)
+    write(2, *) "tolerância"
     write(2, *) tolerance
     close(2)
 
     call sleep(10000)
-    
+
 end program eigenvalues

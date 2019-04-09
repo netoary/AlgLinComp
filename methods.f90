@@ -14,9 +14,9 @@ subroutine retroSubs(a, b, x, n)
 end subroutine
 
 subroutine eliminacaoGauss(a, b, x, n)
-    integer :: n, i, j, k, pivo, r, aux
+    integer :: n, i, j, k, pivo, r
     integer :: p(n)
-    real :: a(n,n), b(n), x(n), soma, mult
+    real :: a(n,n), b(n), x(n), soma, mult, aux
 
     x = 0.0
 
@@ -42,28 +42,46 @@ subroutine eliminacaoGauss(a, b, x, n)
             end do
         end if
 
-        if (r /= k) then
-            aux = p(k)
-            p(k) = p(r)
-            p(r) = aux
+        !if (r /= k) then
+        !if (a(k,k) == 0.0) then
+        !    aux = b(k)
+        !    b(k) = b(r)
+        !    b(r) = aux
+        !    do j=1, n !troca linha r por linha k
+        !        aux = a(j,k)
+        !        a(j,k) = a(j,r)
+        !        a(j,r) = aux
+        !    end do
+        !end if
+
+        if (a(k,k) == 0.0) then
+            aux = b(k)
+            b(k) = b(k+1)
+            b(k+1) = aux
             do j=1, n !troca linha r por linha k
-                aux = a(k,j)
-                a(k,j) = a(r,j)
-                a(r,j) = aux
+                aux = a(j,k)
+                a(j,k) = a(j,k+1)
+                a(j,k+1) = aux
             end do
         end if
 
+
         do i=(k+1), n !eliminação ate chegar numa matriz triangular superior
             mult = a(i,k)/a(k,k)
+            write(*,*) mult
+            write(*,*)
             a(i,k) = a(i,k) - mult * a(k,k)
             do j=(k+1), n
                 a(i,j) = a(i,j) - mult*a(k,j)
             end do
             b(i) = b(i) - mult * b(k)
         end do
+
+        write(*,*)
+        write(*,*)
     end do
 
-    call retroSubs(a,b, x,n)
+    call retroSubs(a, b, x, n)
 
 end subroutine
 
@@ -208,8 +226,7 @@ subroutine decomposicaoCholesky(a, b,x, n)
         end do
         y(i) = (b(i) - soma)/l(i,i)
     end do
-    write(*,*) l
-    write(*,*)
+
     call transposta(l, u, n)
 
     do i=n, 1, -1 !Resolução do sistema Ux=y
@@ -219,7 +236,7 @@ subroutine decomposicaoCholesky(a, b,x, n)
         end do
         x(i) = (y(i)-soma)/u(i,i)
     end do
-    write (*,*) u
+
 
 end subroutine
 
@@ -433,7 +450,7 @@ subroutine powerMethod(a, x, n, tol, lambda)
     lastLambda = 1
     k = 1
 
-    do while(r >= tol)
+    do while(r > tol)
         y = MATMUL(a, x)
 
         lambda = y(1)
