@@ -428,7 +428,6 @@ subroutine identidade(a, n)
     end do
 end subroutine
 
-
 subroutine jacobi(a, x, n, tol, lambda)
     integer :: n, i, j, k, iMax, jMax
     real :: a(n,n), a_transposta(n,n), p(n, n), pT(n,n), x(n, n), lambda(n), tol, phi
