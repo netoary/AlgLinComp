@@ -238,13 +238,30 @@ end subroutine
 
 subroutine interativoJacobi(a, b, x, n)
     integer :: n, i, j, k
-    real :: a(n,n), b(n), xZero(n), tolerancia, r, xNovo(n), xNovoT, x(n), xT, soma
+    real :: a(n,n), b(n), xZero(n), tolerancia, r, xNovo(n), xNovoT, x(n), xT, soma, linha, coluna
 
     k = 1
-    r = 100.0
     tolerancia = 10**(-5)
+    r = tolerancia + 1
     xZero = 1.0
     !xZero(1) = 1.0
+
+    do i=1, n
+        linha = 0
+        coluna = 0
+        do j=1, n
+            if (i /= j) then
+                linha = linha + a(i,j)
+                coluna = coluna + a(j,i)
+            end if
+        end do
+        if (a(i,i) < linha .OR. a(i,i) < coluna) then
+            open(2, file='RESUL.txt', status='replace')
+            write(2,*) 'A matriz A não é diagonal dominante.'
+            close(2)
+            stop 'A matriz A não é diagonal dominante.'
+        end if
+    end do
 
     do while (r > tolerancia .OR. k <= 1000)
         do i=1, n
@@ -261,6 +278,7 @@ subroutine interativoJacobi(a, b, x, n)
         call multiplicaVetor(xNovo, xNovo, xNovoT, n)
         xNovoT = sqrt(xNovoT)
 
+        xt = 0.0
         x = xNovo - xZero
         call multiplicaVetor(x, x, xT, n)
         xT = sqrt(xT)
@@ -276,13 +294,30 @@ end subroutine
 
 subroutine GaussSeidel(a, b, x, n)
     integer :: n, i, j, k
-    real :: a(n,n), b(n), xZero(n), tolerancia, r, xNovo(n), xNovoT, x(n), xT, soma
+    real :: a(n,n), b(n), xZero(n), tolerancia, r, xNovo(n), xNovoT, x(n), xT, soma, linha, coluna
 
     k = 1
     r = 100.0
     tolerancia = 10**(-5)
     xZero = 1.0
     !xZero(1) = 1.0
+
+    do i=1, n
+        linha = 0
+        coluna = 0
+        do j=1, n
+            if (i /= j) then
+                linha = linha + a(i,j)
+                coluna = coluna + a(j,i)
+            end if
+        end do
+        if (a(i,i) < linha .OR. a(i,i) < coluna) then
+            open(2, file='RESUL.txt', status='replace')
+            write(2,*) 'A matriz A não é diagonal dominante.'
+            close(2)
+            stop 'A matriz A não é diagonal dominante.'
+        end if
+    end do
 
     do while (r > tolerancia .OR. k <= 1000)
         do i=1, n
@@ -563,13 +598,14 @@ subroutine minimosQuadrados(b, x, y, n)
     aI(2,1) = -a(2,1)/det
     aI(2,2) = a(1,1)/det
 
-    call multiplicaVetorMatriz(aI, c, b, 2)
+    !call multiplicaVetorMatriz(aI, c, b, 2)
+    b = matmul(aI, c)
     write(*,*) a
     write(*,*) c
     write(*,*) b
 
 
-    do i = 1, n
-        lambda(i) = a(i, i)
-    end do
+    !do i = 1, n
+    !    lambda(i) = a(i, i)
+    !end do
 end subroutine

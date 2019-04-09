@@ -10,7 +10,7 @@ program algcomp
     real, allocatable, dimension(:,:) :: a, d, c, at, aInversa
 
     ! abertura do arquivo sistema.txt e leitura
-    open (1, file='sistema4.txt', status='old', action='read')
+    open (1, file='sistema.txt', status='old', action='read')
     read(1,*) n, m
     allocate(a(n,m))
     do i=1, m
@@ -38,9 +38,9 @@ program algcomp
     !call eliminacaoGauss(a, b, x, n)
     !call eliminacaoGaussJordan(a, b, x, n)
     !call decomposicaoLU(a, b, x, n)
-    call decomposicaoCholesky(a, b, x, n)
+    !call decomposicaoCholesky(a, b, x, n)
     !call interativoJacobi(a, b, x, n)
-    !call GaussSeidel(a, b, x, n)
+    call GaussSeidel(a, b, x, n)
     !call inversa(a, aInversa, n)
     !call determinante(a, n, det)
 
