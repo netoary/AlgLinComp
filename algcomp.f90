@@ -4,7 +4,7 @@ program algcomp
     integer :: n, m, i, j
     real :: det
     real, allocatable, dimension(:) :: b, x
-    real, allocatable, dimension(:,:) :: a, d, c, at, aInversa
+    real, allocatable, dimension(:,:) :: a, d, c, at, aInversa, aOriginal
 
     ! abertura do arquivo sistema.txt e leitura
     open (1, file='sistema.txt', status='old', action='read')
@@ -33,6 +33,8 @@ program algcomp
     allocate(x(n))
     x = 0.0
     allocate(aInversa(n,n))
+    allocate(aOriginal(n,n))
+    aOriginal = a
 
     do i = 1, n
         do j = 1, n
@@ -47,7 +49,7 @@ program algcomp
     !call decomposicaoCholesky(a, b, x, n)
     !call interativoJacobi(a, b, x, n)
     !call GaussSeidel(a, b, x, n)
-    !call inversa(a, aInversa, n)
+    call inversa(aOriginal, aInversa, n)
     !call inversaALT(a, aInversa, n)
     call determinante(a, n, det)
 
@@ -61,7 +63,7 @@ program algcomp
     end do
     write(2, *) "A^-1"
     do i=1, n
-        write(2,*) (aInversa(j, i), j=1, n)
+        write(2,*) (aInversa(j,i), j=1, n)
     end do
     write(2, *) "x"
     write(2, *) (x(i), i=1, n)

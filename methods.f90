@@ -483,16 +483,16 @@ subroutine inversa(a, aInversa, n)
             end do
         end do
     end do
-    write(*,*) a
+    !write(*,*) a
 
     do i=1, n
         if (a(i,i) /= 0.0) then
             do j=1, n
-                b(i,j) = b(i,j)/a(i,i)
+                b(j,i) = b(j,i)/a(i,i)
             end do
         end if
     end do
-    write(*,*) b
+    !write(*,*) b
 
     aInversa = b
 
