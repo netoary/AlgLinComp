@@ -23,7 +23,7 @@ program algcomp
     d(1,1) = 1.0
     d(1,2) = 0.0
     d(1,3) = 0.0
-    d(2,1) = 0.0
+    d(2,1) = 5.0
     d(2,2) = 1.0
     d(2,3) = 0.0
     d(3,1) = 0.0
@@ -34,13 +34,21 @@ program algcomp
     x = 0.0
     allocate(aInversa(n,n))
 
+    do i = 1, n
+        do j = 1, n
+            !write(*,*) d(i, j)
+        end do
+    end do
+
     !call eliminacaoGauss(a, b, x, n)
-    !call eliminacaoGaussJordan(a, b, x, n)
+    !call eliminacaoGaussALT(a, b, x, n)
+    call eliminacaoGaussJordan(a, b, x, n)
     !call decomposicaoLU(a, b, x, n)
     !call decomposicaoCholesky(a, b, x, n)
     !call interativoJacobi(a, b, x, n)
     !call GaussSeidel(a, b, x, n)
-    call inversa(a, aInversa, n)
+    !call inversa(a, aInversa, n)
+    !call inversaALT(a, aInversa, n)
     call determinante(a, n, det)
 
     allocate(at(n,n))
