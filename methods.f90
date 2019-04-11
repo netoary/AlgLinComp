@@ -2,7 +2,7 @@ subroutine retroSubs(a, b, x, n)
     integer :: n, i, j
     real :: a(n,n), b(n), x(n), soma
 
-    x(n) = x(n) / a(n, n)
+    x(n) = b(n) / a(n, n)
     do i = n-1, 1, -1
         soma = 0.0
         do j = i + 1, n
@@ -22,6 +22,10 @@ subroutine eliminacaoGauss(a, b, x, n)
     call identidade(p, n)
 
     do k = 1, (n-1)
+
+        print*, "A=", a
+        print*, "B=", b
+        print*,""
         pivo = a(k,k)
         if (pivo == 0) then
             call identidade(p, n)
@@ -43,22 +47,20 @@ subroutine eliminacaoGauss(a, b, x, n)
             print*, "P=", p
             a = matmul(a, p)
             b = matmul(b, p)
+            print*, "PA=", a
+            print*, "PB=", b
+            pivo = a(k,k)
         end if
 
-
-        print*, "A=", a
-        print*, "B=", b
-        print*,""
         call identidade(m, n)
 
-        pivo = a(k,k)
         do i=(k+1), n !eliminação ate chegar numa matriz triangular superior
             m(k, i) = -a(k, i)/pivo
         end do
         a = matmul(a, m)
         b = matmul(b, m)
-        print*, "PA=", a
-        print*, "PB=", b
+        print*, "AM=", a
+        print*, "BM=", b
         print*,""
         print*,""
         print*,""
@@ -584,10 +586,12 @@ subroutine powerMethod(a, x, n, tol, lambda)
     r = tol + 1
     x = 1.0
     lastLambda = 1
-    k = 1
+    k = 0
 
+    print*, "x(", k, ") = ", x
     do while(r > tol)
         y = MATMUL(a, x)
+        print*, "y(", k, ") = ", y
 
         lambda = y(1)
         do i = 2, n
@@ -596,12 +600,12 @@ subroutine powerMethod(a, x, n, tol, lambda)
         r = abs(lambda - lastLambda) / abs(lambda)
         lastLambda = lambda
 
+        k = k + 1
         print*, "x(", k, ") = ", x
         print*, "lambda = ", lambda
         print*, "r = ", r
         print*,""
 
-        k = k + 1
         !call sleep(1)
     end do
 end subroutine

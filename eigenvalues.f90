@@ -6,14 +6,18 @@ implicit none
     real, allocatable, dimension(:) :: lambda
     real, allocatable, dimension(:,:) :: a, x
     real :: tolerance
+    Character(len = 100) :: fileName
 
-    open (1, file='sistema_2_1.txt', status='old', action='read')
+
+    print*,"Digite o nome do arquivo com o sistema a ser resolvido:"
+    read(*,*) fileName
+    open (1, file=fileName, status='old', action='read')
 
     read(1,*) n, m
     allocate(a(n,m))
 
     do i=1, m
-        read(1,*) ( a(i,j) , j= 1 , n)
+        read(1,*) ( a(j,i) , j= 1 , n)
     end do
 
     read(1, *) tolerance
@@ -26,10 +30,13 @@ implicit none
 
     x = 0
     lambda = 0
-    !call powerMethod(a, x, n, tolerance, lambda(1))
-    call jacobi(a, x, n, tolerance, lambda)
+    call powerMethod(a, x, n, tolerance, lambda(1))
+    !call jacobi(a, x, n, tolerance, lambda)
 
-    open(2, file='RESUL.txt', status='replace')
+    print*, "lambda = ", lambda
+    print*, "x = ", x
+
+    open(2, file='RESUL_' // fileName //'.txt', status='replace')
     write(2, *) "A"
     do i=1, n
         write(2,*) (a(i, j), j=1, n)

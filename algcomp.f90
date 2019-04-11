@@ -6,17 +6,20 @@ program algcomp
     real, allocatable, dimension(:) :: b, x
     real, allocatable, dimension(:,:) :: a, d, c, at, aInversa, aOriginal
 
-    ! abertura do arquivo sistema.txt e leitura
-    open (1, file='sistema.txt', status='old', action='read')
+    Character(len = 100) :: fileName
+
+
+    print*,"Digite o nome do arquivo com o sistema a ser resolvido:"
+    read(*,*) fileName
+    open (1, file=fileName, status='old', action='read')
     read(1,*) n, m
     allocate(a(n,m))
     do i=1, m
-        read(1,*) ( a(i,j) , j= 1 , n)
+        read(1,*) ( a(i, j) , j= 1 , n)
     end do
     allocate(b(n))
     read(1,*) ( b(i) , i= 1 , n)
     close(1)
-
     tol = 10**(-5)
 
     allocate(d(n,n))
@@ -36,19 +39,18 @@ program algcomp
     allocate(aOriginal(n,n))
     aOriginal = a
 
-    call eliminacaoGauss(a, b, x, n)
     !call eliminacaoGaussJordan(a, b, x, n)
     !call decomposicaoLU(a, b, x, n)
     !call decomposicaoCholesky(a, b, x, n)
     !call interativoJacobi(a, b, x, n)
-    !call GaussSeidel(a, b, x, n)
+    call GaussSeidel(a, b, x, n)
     !call inversa(a, aInversa, n)
     !call determinante(a, n, det)
 
     allocate(at(n,n))
     call transposta(a, at, n)
 
-    open(2, file='RESUL.txt', status='replace')
+    open(2, file='RESUL_' // fileName //'.txt', status='replace')
     write(2, *) "A"
     do i=1, n
         write(2,*) (a(i, j), j=1, n)
