@@ -66,13 +66,89 @@ subroutine eliminacaoGauss(a, b, x, n)
     call retroSubs(a, b, x, n)
 end subroutine
 
+subroutine eliminacaoGaussALT(a, b, x, n)
+    integer :: n, i, j, k, pivo, r
+    integer :: p(n)
+    real :: a(n,n), b(n), x(n), soma, mult, aux, m(n,n), at(n,n)
+
+    x = 0.0
+
+    do i=1, n
+        p(i) = i
+    end do
+
+    call transposta(a, at, n)
+
+    do k = 1, (n-1)
+        pivo = a(k,k)
+        r = k
+        if (pivo == 0) then
+            do i= k+1, n
+                if(a(i,k)==0) then
+                    if (i == n) then
+                        open(2, file='RESUL.txt', status='replace')
+                            write(2,*) 'A matriz A é singular.'
+                        close(2)
+                        stop 'A matriz A é singular.'
+                    end if
+                else
+                    r = i
+                end if
+            end do
+        end if
+
+        if (at(k,k) == 0.0) then
+            STOP 'falta pivoteamento'
+            aux = b(k)
+            b(k) = b(k+1)
+            b(k+1) = aux
+            do j=1, n !troca linha r por linha k
+                aux = a(j,k)
+                a(j,k) = a(j,k+1)
+                a(j,k+1) = aux
+            end do
+        end if
+
+
+        call identidade(m, n)
+        do i=(k+1), n !eliminação ate chegar numa matriz triangular superior
+            m(i,k) = -a(i,k)/a(k,k)
+            !m(k,i) = -a(k,i)/a(k,k)
+        end do
+        write(*,*) m
+        !write(*,*) a
+        !write(*,*) b
+
+        a = MATMUL(m, a)
+        b = MATMUL(m, b)
+
+
+    end do
+    call transposta(a, at, n)
+
+    call retroSubs(at, b, x, n)
+
+end subroutine
+
+subroutine multiplicaVetorMatriz(a, b, c, n)
+    !multiplicação de vetores de tamanho n
+    integer :: n, i, j, k, m
+    real :: a(n), b(n), c
+
+    c = 0.0
+    do j=1, n
+        c = c + a(j)*b(j)
+    end do
+
+end subroutine
+
 subroutine eliminacaoGaussJordan(a, b, x, n)
     integer :: n, i, j, k
     real :: a(n,n), b(n), x(n), mult
 
     x = 0.0
 
-    call eliminacaoGauss(a, b, x, n)
+    call eliminacaoGaussALT(a, b, x, n)
 
     do k = n, 2, -1
 
@@ -207,8 +283,7 @@ subroutine decomposicaoCholesky(a, b,x, n)
         end do
         y(i) = (b(i) - soma)/l(i,i)
     end do
-    write(*,*) l
-    write(*,*)
+
     call transposta(l, u, n)
 
     do i=n, 1, -1 !Resolução do sistema Ux=y
@@ -218,7 +293,7 @@ subroutine decomposicaoCholesky(a, b,x, n)
         end do
         x(i) = (y(i)-soma)/u(i,i)
     end do
-    write (*,*) u
+
 
 end subroutine
 
@@ -374,6 +449,8 @@ subroutine inversa(a, aInversa, n)
             end do
         end do
     end do
+    !write(*,*) b
+
     do k = n, 2, -1
         do i=(k-1), 1, -1 !eliminação ate chegar numa matriz diagonal
             mult = a(i,k)/a(k,k)
@@ -383,9 +460,12 @@ subroutine inversa(a, aInversa, n)
             end do
             do l=n, 1, -1
                 b(l,i) = b(l,i) - mult * b(l,k)
+                !b(i,l) = b(i,l) - mult * b(k,l)
             end do
         end do
     end do
+    !write(*,*) a
+
     do i=1, n
         if (a(i,i) /= 0.0) then
             do j=1, n
@@ -393,6 +473,80 @@ subroutine inversa(a, aInversa, n)
             end do
         end if
     end do
+    !write(*,*) b
+
+    aInversa = b
+
+end subroutine
+
+subroutine inversaALT(a, aInversa, n)
+    integer :: n, i, j, k, l
+    real :: a(n,n), b(n,n), x(n), mult, aInversa(n,n), m(n,n), at(n,n)
+
+    x = 0.0
+    aInversa = 0.0
+
+    do i=1, n
+        do j=1, n
+            if (i==j) then
+                b(i,j) = 1.0
+            else
+                b(i,j) = 0.0
+            end if
+        end do
+    end do
+
+    call transposta(a, at, n)
+    write(*,*) b
+    write(*,*)
+
+    do k = 1, (n-1)
+        call identidade(m, n)
+        do i=(k+1), n !eliminação ate chegar numa matriz triangular superior
+            m(k,i) = -at(k,i)/at(k,k)
+        end do
+        write(*,*)
+        write(*,*) m
+        write(*,*) b
+        at = MATMUL(m, at)
+        b = MATMUL(m, b)
+        write(*,*)
+        write(*,*) b
+    end do
+    !write(*,*) m
+    write(*,*)
+    !write(*,*) a
+    write(*,*)
+    !write(*,*) b
+
+    do k = n, 2, -1
+        call identidade(m, n)
+        do i=(k-1), 1, -1 !eliminação ate chegar numa matriz diagonal
+
+            m(k,i) = -at(k,i)/at(k,k)
+            !mult = a(i,k)/a(k,k)
+            !a(i,k) = a(i,k) - mult * a(k,k)
+            !do j=(k-1), 1, -1
+            !    a(i,j) = a(i,j) - mult*a(k,j)
+            !end do
+            !do l=n, 1, -1
+            !    b(l,i) = b(l,i) - mult * b(l,k)
+            !    !b(i,l) = b(i,l) - mult * b(k,l)
+            !end do
+        end do
+        at = MATMUL(m, at)
+        b = matmul(m, b)
+    end do
+    !write(*,*) a
+
+    do i=1, n
+        if (a(i,i) /= 0.0) then
+            do j=1, n
+                b(i,j) = b(i,j)/a(i,i)
+            end do
+        end if
+    end do
+    !write(*,*) b
 
     aInversa = b
 
@@ -432,7 +586,7 @@ subroutine powerMethod(a, x, n, tol, lambda)
     lastLambda = 1
     k = 1
 
-    do while(r >= tol)
+    do while(r > tol)
         y = MATMUL(a, x)
 
         lambda = y(1)

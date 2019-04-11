@@ -1,13 +1,10 @@
-! FALTA
-! prepare as mesmas para indicar casos onde as decomposições não são possíveis
-! na decomposicaoLU e decomposicaoCholesky
 include 'methods.f90'
 
 program algcomp
     integer :: n, m, i, j
     real :: det
     real, allocatable, dimension(:) :: b, x
-    real, allocatable, dimension(:,:) :: a, d, c, at, aInversa
+    real, allocatable, dimension(:,:) :: a, d, c, at, aInversa, aOriginal
 
     ! abertura do arquivo sistema.txt e leitura
     open (1, file='sistema.txt', status='old', action='read')
@@ -20,11 +17,13 @@ program algcomp
     read(1,*) ( b(i) , i= 1 , n)
     close(1)
 
+    tol = 10**(-5)
+
     allocate(d(n,n))
     d(1,1) = 1.0
     d(1,2) = 0.0
     d(1,3) = 0.0
-    d(2,1) = 0.0
+    d(2,1) = 5.0
     d(2,2) = 1.0
     d(2,3) = 0.0
     d(3,1) = 0.0
@@ -34,6 +33,8 @@ program algcomp
     allocate(x(n))
     x = 0.0
     allocate(aInversa(n,n))
+    allocate(aOriginal(n,n))
+    aOriginal = a
 
     call eliminacaoGauss(a, b, x, n)
     !call eliminacaoGaussJordan(a, b, x, n)
@@ -48,10 +49,17 @@ program algcomp
     call transposta(a, at, n)
 
     open(2, file='RESUL.txt', status='replace')
+    write(2, *) "A"
     do i=1, n
         write(2,*) (a(i, j), j=1, n)
     end do
+    write(2, *) "A^-1"
+    do i=1, n
+        write(2,*) (aInversa(j,i), j=1, n)
+    end do
+    write(2, *) "x"
     write(2, *) (x(i), i=1, n)
+    write(2, *) "determinante"
     write(2, *) det
     close(2)
 
