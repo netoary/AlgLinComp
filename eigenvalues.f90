@@ -7,7 +7,7 @@ implicit none
     real, allocatable, dimension(:,:) :: a, x
     real :: tolerance
 
-    open (1, file='sistema_2_2.txt', status='old', action='read')
+    open (1, file='sistema_2_1.txt', status='old', action='read')
 
     read(1,*) n, m
     allocate(a(n,m))

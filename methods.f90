@@ -2,32 +2,29 @@ subroutine retroSubs(a, b, x, n)
     integer :: n, i, j
     real :: a(n,n), b(n), x(n), soma
 
-    x = 0.0
-
-    do i = n, 1, -1
+    x(n) = x(n) / a(n, n)
+    do i = n-1, 1, -1
         soma = 0.0
-        do j = i+1, n
-            soma = soma + a(i,j) * x(j)
+        do j = i + 1, n
+            soma = soma + a(j, i) * x(j)
         end do
-        x(i) = (b(i) - soma)/a(i,i)
+        x(i) = (b(i) - soma) / a(i, i)
     end do
 end subroutine
 
 subroutine eliminacaoGauss(a, b, x, n)
-    integer :: n, i, j, k, pivo, r, aux
-    integer :: p(n)
+    integer :: n, i, j, k, pivo
+    real :: p(n, n), m(n, n)
+    real :: aux(n)
     real :: a(n,n), b(n), x(n), soma, mult
 
-    x = 0.0
-
-    do i=1, n
-        p(i) = i
-    end do
+    p = 0
+    call identidade(p, n)
 
     do k = 1, (n-1)
         pivo = a(k,k)
-        r = k
         if (pivo == 0) then
+            call identidade(p, n)
             do i= k+1, n
                 if(a(i,k)==0) then
                     if (i == n) then
@@ -37,34 +34,36 @@ subroutine eliminacaoGauss(a, b, x, n)
                         stop 'A matriz A é singular.'
                     end if
                 else
-                    r = i
+                    aux = p(k,:)
+                    p(k,:) = p(i,:)
+                    p(i,:) = aux
+                    exit
                 end if
             end do
+            print*, "P=", p
+            a = matmul(a, p)
+            b = matmul(b, p)
         end if
 
-        if (r /= k) then
-            aux = p(k)
-            p(k) = p(r)
-            p(r) = aux
-            do j=1, n !troca linha r por linha k
-                aux = a(k,j)
-                a(k,j) = a(r,j)
-                a(r,j) = aux
-            end do
-        end if
 
+        print*, "A=", a
+        print*, "B=", b
+        print*,""
+        call identidade(m, n)
+
+        pivo = a(k,k)
         do i=(k+1), n !eliminação ate chegar numa matriz triangular superior
-            mult = a(i,k)/a(k,k)
-            a(i,k) = a(i,k) - mult * a(k,k)
-            do j=(k+1), n
-                a(i,j) = a(i,j) - mult*a(k,j)
-            end do
-            b(i) = b(i) - mult * b(k)
+            m(k, i) = -a(k, i)/pivo
         end do
+        a = matmul(a, m)
+        b = matmul(b, m)
+        print*, "PA=", a
+        print*, "PB=", b
+        print*,""
+        print*,""
+        print*,""
     end do
-
-    call retroSubs(a,b, x,n)
-
+    call retroSubs(a, b, x, n)
 end subroutine
 
 subroutine eliminacaoGaussJordan(a, b, x, n)
