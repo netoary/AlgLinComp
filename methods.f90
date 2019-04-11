@@ -240,7 +240,7 @@ subroutine decomposicaoLU(a, b, x, n)
 
 end subroutine
 
-subroutine decomposicaoCholesky(a, b,x, n)
+subroutine decomposicaoCholesky(a, b, x, n)
     integer :: n, i, j, k
     real :: a(n,n), a_transposta(n,n), b(n), x(n), l(n,n), soma, y(n), u(n,n), a_soma
 
@@ -312,12 +312,11 @@ subroutine determinante(a, n, det)
     end do
 end subroutine
 
-subroutine interativoJacobi(a, b, x, n)
+subroutine interativoJacobi(a, b, x, n, tolerancia, k)
     integer :: n, i, j, k
     real :: a(n,n), b(n), xZero(n), tolerancia, r, xNovo(n), xNovoT, x(n), xT, soma, linha, coluna
 
     k = 1
-    tolerancia = 10**(-5)
     r = tolerancia + 1
     xZero = 1.0
     !xZero(1) = 1.0
@@ -332,14 +331,14 @@ subroutine interativoJacobi(a, b, x, n)
             end if
         end do
         if (a(i,i) < linha .OR. a(i,i) < coluna) then
-            open(2, file='RESUL.txt', status='replace')
+            open(2, file='Q3.txt', status='replace')
             write(2,*) 'A matriz A não é diagonal dominante.'
             close(2)
             stop 'A matriz A não é diagonal dominante.'
         end if
     end do
 
-    do while (r > tolerancia .OR. k <= 1000)
+    do while (r > tolerancia)
         do i=1, n
             soma = 0.0
             do j=1, n
@@ -368,13 +367,12 @@ subroutine interativoJacobi(a, b, x, n)
 
 end subroutine
 
-subroutine GaussSeidel(a, b, x, n)
+subroutine GaussSeidel(a, b, x, n, tolerancia, k)
     integer :: n, i, j, k
     real :: a(n,n), b(n), xZero(n), tolerancia, r, xNovo(n), xNovoT, x(n), xT, soma, linha, coluna
 
     k = 1
     r = 100.0
-    tolerancia = 10**(-5)
     xZero = 1.0
     !xZero(1) = 1.0
 
@@ -395,7 +393,7 @@ subroutine GaussSeidel(a, b, x, n)
         end if
     end do
 
-    do while (r > tolerancia .OR. k <= 1000)
+    do while (r > tolerancia)
         do i=1, n
             soma = 0.0
             do j=1, (i-1)
@@ -579,7 +577,7 @@ subroutine transposta(a, at, n)
     end do
 end subroutine
 
-subroutine powerMethod(a, x, n, tol, lambda)
+subroutine powerMethod(a, x, n, tol, lambda, k)
     integer :: n, i, k
     real :: a(n,n), x(n), y(n), lambda, lastLambda, r, tol
 
@@ -587,10 +585,11 @@ subroutine powerMethod(a, x, n, tol, lambda)
     x = 1.0
     lastLambda = 1
     k = 0
-
+    
     print*, "x(", k, ") = ", x
     do while(r > tol)
         y = MATMUL(a, x)
+        k = k + 1
         print*, "y(", k, ") = ", y
 
         lambda = y(1)
@@ -600,7 +599,6 @@ subroutine powerMethod(a, x, n, tol, lambda)
         r = abs(lambda - lastLambda) / abs(lambda)
         lastLambda = lambda
 
-        k = k + 1
         print*, "x(", k, ") = ", x
         print*, "lambda = ", lambda
         print*, "r = ", r
@@ -620,7 +618,7 @@ subroutine identidade(a, n)
     end do
 end subroutine
 
-subroutine jacobi(a, x, n, tol, lambda)
+subroutine jacobi(a, x, n, tol, lambda, k)
     integer :: n, i, j, k, iMax, jMax
     real :: a(n,n), a_transposta(n,n), p(n, n), pT(n,n), x(n, n), lambda(n), tol, phi
     logical :: done
