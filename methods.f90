@@ -12,9 +12,20 @@ subroutine retroSubs(a, b, x, n)
     end do
 end subroutine
 
+subroutine printMatrix(a, n, m, name)
+    integer :: n, m, i, j
+    real :: a(n,n)
+    Character(len = 2) :: name
+
+    print*, name, " = "
+    do i = 1, n
+        print*, (a(j, i), j=1, m)
+    end do
+end subroutine
+
 subroutine eliminacaoGauss(a, b, x, n)
-    integer :: n, i, j, k, pivo
-    real :: p(n, n), m(n, n)
+    integer :: n, i, j, k
+    real :: p(n, n), m(n, n), pivo
     real :: aux(n)
     real :: a(n,n), b(n), x(n), soma, mult
 
@@ -22,12 +33,13 @@ subroutine eliminacaoGauss(a, b, x, n)
     call identidade(p, n)
 
     do k = 1, (n-1)
-
-        print*, "A=", a
-        print*, "B=", b
+        call printMatrix(a, n, n, " A")
+        call printMatrix(b, 1, n, " B")
         print*,""
         pivo = a(k,k)
-        if (pivo == 0) then
+        if (pivo == 0.0) then
+            print *, k, k, pivo, a(k,k)
+            call sleep(100)
             call identidade(p, n)
             do i= k+1, n
                 if(a(i,k)==0) then
@@ -35,7 +47,8 @@ subroutine eliminacaoGauss(a, b, x, n)
                         open(2, file='RESUL.txt', status='replace')
                             write(2,*) 'A matriz A é singular.'
                         close(2)
-                        stop 'A matriz A é singular.'
+                        write(*,*) 'A matriz A é singular.'
+                        call sleep(10)
                     end if
                 else
                     aux = p(k,:)
@@ -59,8 +72,9 @@ subroutine eliminacaoGauss(a, b, x, n)
         end do
         a = matmul(a, m)
         b = matmul(b, m)
-        print*, "AM=", a
-        print*, "BM=", b
+        
+        !call printMatrix(a, n, n, "MA")
+        !call printMatrix(b, 1, n, "MB")
         print*,""
         print*,""
         print*,""
