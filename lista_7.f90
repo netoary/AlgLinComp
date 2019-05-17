@@ -8,7 +8,7 @@ program lista_7
     deltaX = 0.001
     deltaX1 = 0.5
     deltaX2 = 0.25
-    x = 1
+    x = 2
     p = 1
     fLinha = 0
 
