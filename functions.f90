@@ -108,6 +108,63 @@ subroutine metodoDeNewtonSecante(func, tol, x0, nIter, deltaX, a)
     write (*,*) 'Convergencia não atingida.'
 end subroutine
 
+subroutine interpolacaoInversa(func, tol, nIter, a, x)
+    procedure(IFunction) :: func
+    real, intent(in) :: tol
+    integer, intent(in) :: nIter
+
+    real, dimension(3) :: x, y, auxX
+    real :: xK, xK_1, tolK, aux
+    integer :: k, i, j
+
+    real, intent(out) :: a
+
+
+    xK_1 = 10E+36
+    auxX = x
+    do k = 1, nIter
+        write (*,*) ""
+        write (*,*) "k=", k
+
+        write (*,*) "x1=", auxX(1)
+        write (*,*) "x2=", auxX(2)
+        write (*,*) "x3=", auxX(3)
+        y(1) = func(auxX(1))
+        y(2) = func(auxX(2))
+        y(3) = func(auxX(3))
+        write (*,*) "y1=", y(1)
+        write (*,*) "y2=", y(2)
+        write (*,*) "y3=", y(3)
+
+        xK = (y(2) * y(3) * auxX(1)) / ((y(1) - y(2)) * (y(1) - y(3))) + &
+             (y(1) * y(3) * auxX(2)) / ((y(2) - y(1)) * (y(2) - y(3))) + &
+             (y(1) * y(2) * auxX(3)) / ((y(3) - y(1)) * (y(3) - y(2))) 
+        write (*,*) "x*=", xK    
+        
+        tolK = abs(xK - xK_1)
+        write (*,*) "tol=", tolK
+
+        if (tolK.lt.tol) then
+            a = xK
+            return
+        else
+            i = MAXLOC(abs(y), DIM = 1)
+            auxX(i) = xK
+            y(i) = func(xK)
+            
+            do i = 1, 3
+                aux = auxX(i)
+                j = MINLOC(auxX(i:), DIM = 1) + i - 1
+
+                auxX(i) = auxX(j)
+                auxX(j) = aux
+            end do
+        endif
+
+        xK_1 = xK
+    end do
+end subroutine
+
 subroutine diferencaCentral(f, x, deltaX, fLinha)
     procedure(IFunction) :: f
     real :: x, deltaX, f1, f2, fLinha

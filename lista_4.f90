@@ -11,8 +11,9 @@ program lista_4
     a = 0
     b = 10
     !call bissecao(f1, tol, a, b)
-    call metodoDeNewtonOriginal(f1, df1, tol, 10.0, 100, a)
+    !call metodoDeNewtonOriginal(f1, df1, tol, 10.0, 100, a)
     !call metodoDeNewtonSecante(f1, tol, 10.0, 100, 0.001, a)
+    call interpolacaoInversa(f1, 5E-4, 100, a, [3.0, 5.0, 10.0])
     !call f(b, y)
 
     write (*,*) a
