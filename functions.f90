@@ -43,8 +43,8 @@ subroutine bissecao(f, tol, a, b)
 
 end subroutine
 
-subroutine metodoDeNewtonOriginal(func, tol, x0, nIter, a)
-    procedure(IFunction) :: func
+subroutine metodoDeNewtonOriginal(func, dfunc, tol, x0, nIter, a)
+    procedure(IFunction) :: func, dfunc
     real :: tol, x0, xK, xK_1, f, df, tolK, a
     integer :: nIter, k
 
@@ -55,7 +55,7 @@ subroutine metodoDeNewtonOriginal(func, tol, x0, nIter, a)
         f = func(xK_1)
         write (*,*) "f=", f
 
-        call diferencaCentral(func, xK_1, 0.25, df)
+        df = dfunc(xK_1) !call diferencaCentral(func, xK_1, 0.25, df)
         write (*,*) "df=", df
 
         xK = xK_1 - f/df

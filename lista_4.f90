@@ -11,7 +11,7 @@ program lista_4
     a = 0
     b = 10
     !call bissecao(f1, tol, a, b)
-    call metodoDeNewtonOriginal(f1, tol, 10.0, 100, a)
+    call metodoDeNewtonOriginal(f1, df1, tol, 10.0, 100, a)
     !call metodoDeNewtonSecante(f1, tol, 10.0, 100, 0.001, a)
     !call f(b, y)
 
@@ -26,6 +26,14 @@ contains
         !y = x*x
         !y = sin(x)
         y = x**2 - 4 * cos(x)
+    end function
+
+    real function df1(x) result(y)
+        real, intent(in) :: x
+        !y = x*x - 4 * cos(x)
+        !y = x*x
+        !y = sin(x)
+        y = 2*x + 4 * sin(x)
     end function
 
 end program lista_4
