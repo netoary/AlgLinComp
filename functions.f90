@@ -5,6 +5,17 @@ function IFunction(x) result (y)
     real, intent(in) :: x
     real             :: y
 end function IFunction
+
+
+function IFunctionMD(x) result (y)
+    real, dimension(:), intent(in) :: x
+    real, allocatable, dimension(:) :: y
+end function IFunctionMD
+
+function IJacobian(x) result (y)
+    real, dimension(:), intent(in) :: x
+    real, allocatable, dimension(:,:) :: y
+end function IJacobian
 end interface
 
 contains
@@ -163,6 +174,133 @@ subroutine interpolacaoInversa(func, tol, nIter, a, x)
 
         xK_1 = xK
     end do
+    write (*,*) 'Convergencia não atingida.'
+end subroutine
+
+real function euclidianModule(A)
+    real, dimension(:) :: A
+    integer :: i, j
+
+    do i = 1, size(A)
+        euclidianModule = euclidianModule + A(i) ** 2
+    end do
+    euclidianModule = sqrt(euclidianModule)
+end function
+
+subroutine metodoDeNewtonMD(func, Jac, tol, x, nIter)
+    procedure (IFunctionMD) :: func
+    procedure (IJacobian) :: Jac
+    real :: tol, tolK
+    real, dimension(:) :: x
+    real, allocatable, dimension(:) :: F, deltaX
+    real, allocatable, dimension(:,:) :: J, J_1
+    integer :: nIter, k
+
+    allocate(deltaX, mold = x)
+    allocate(F, source = func(x))
+    write (*,*) 'F=', F
+
+    allocate(J, source = Jac(x))
+    write (*,*) 'J=', J
+
+    allocate(J_1, mold = J)
+    call inversa(J, J_1, size(J_1(1,:)))
+    write (*,*) 'J_1=', J_1
+
+    deltaX = - matmul(J_1, F)
+
+    do k = 2, nIter    
+        write (*,*) ""
+        write (*,*) 'k=', k
+        x = x + deltaX
+        tolK = euclidianModule(deltaX) / euclidianModule(x)
+        
+        write (*,*) 'x=', x
+        write (*,*) 'deltaX=', deltaX
+        if (tolK.lt.tol) then
+            return
+        end if
+
+
+        F = func(x)
+        J = Jac(x)
+        call inversa(J, J_1, size(J_1(1,:)))
+
+        deltaX = - matmul(J_1, F)
+    end do
+    write (*,*) 'Convergencia não atingida.'
+end subroutine
+
+function transposeVector(v) result(vT)
+    real, dimension(:), intent(in) :: v
+    real, allocatable, dimension(:,:) :: vT
+    integer :: i
+    allocate(vT(1, size(v)))
+
+    do i = 1, size(v)
+        vT(1, i) = v(i)
+    end do
+end function
+
+subroutine metodoDeBroydenMD(func, B, tol, x, nIter)
+    procedure (IFunctionMD) :: func
+    real :: tol, tolK
+    real, dimension(:) :: x
+    real, dimension(:,:) :: B
+    real, allocatable, dimension(:) :: F, deltaX, Y
+    real, allocatable, dimension(:,:) :: J, B_1, J_1, deltaX_T
+    integer :: nIter, k
+
+    allocate(deltaX, mold = x)
+    allocate(F, source = func(x))
+    allocate(J, source = B)
+    allocate(B_1, source = B)
+    allocate(Y, mold = x)
+    allocate(J_1, mold = J)
+    allocate(deltaX_T(1, size(deltaX)))
+    
+    x = x + deltaX
+    write (*,*) 'b=', B
+    do k = 2, nIter    
+        write (*,*) ""
+        write (*,*) 'k=', k
+
+
+        write (*,*) 'F=', F
+        write (*,*) 'J=', J
+        call inversa(J, J_1, size(J_1(1,:)))
+        write (*,*) 'J_1=', J_1
+
+        deltaX = - matmul(J_1, F)
+        write (*,*) 'deltaX=', deltaX
+
+        x = x + deltaX
+        write (*,*) 'x=', x
+        Y = func(x) - F
+        write (*,*) 'Y=', Y
+
+        tolK = euclidianModule(deltaX) / euclidianModule(x)
+        
+        write (*,*) 'tolK=', tolK, ",", euclidianModule(deltaX), ",", euclidianModule(x)
+        if (tolK.lt.tol) then
+            return
+        else
+            deltaX_T = transposeVector(deltaX)
+            !write (*,*) 'deltaX_T=',  MATMUL(reshape(Y - MATMUL(B_1, deltaX), shape=(/ 2, 1 /)), deltaX_T)
+            B = B_1 + MATMUL(reshape(Y - MATMUL(B_1, deltaX), shape=(/ 2, 1 /)), deltaX_T) / dot_product(deltaX, deltaX)
+        
+            write (*,*) 'B=', B
+        end if
+
+
+        F = func(x)
+        J = B_1
+        B_1 = B
+        call inversa(J, J_1, size(J_1(1,:)))
+
+        deltaX = - matmul(J_1, F)
+    end do
+    write (*,*) 'Convergencia não atingida.'
 end subroutine
 
 subroutine diferencaCentral(f, x, deltaX, fLinha)
