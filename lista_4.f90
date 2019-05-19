@@ -4,8 +4,7 @@ include 'functions.f90'
 program lista_4
     use functions
     IMPLICIT NONE
-    integer n, i, j
-    real :: a, b, tol, y
+    real :: a, b, tol
     real, dimension(2) :: x
 
 
@@ -25,12 +24,8 @@ program lista_4
     call sleep(10000)
 
 contains
-    
     real function f1(x) result(y)
         real, intent(in) :: x
-        !y = x*x - 4 * cos(x)
-        !y = x*x
-        !y = sin(x)
         y = x**2 - 4 * cos(x)
     end function
 

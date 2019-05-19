@@ -303,6 +303,70 @@ subroutine metodoDeBroydenMD(func, B, tol, x, nIter)
     write (*,*) 'Convergencia não atingida.'
 end subroutine
 
+function readTable(fileName, n) result(table)
+    Character(len=*) :: fileName
+    real, dimension(:,:), allocatable :: table
+    integer :: i, j
+    integer, intent(out) :: n
+
+    open (1, file=fileName, status='old', action='read')
+    read(1,*) n
+    allocate(table(n, 2))
+    do i=1, n
+        read(1,*) j, table(i, 1), table(i, 2)
+    end do
+    close (1)    
+end function
+
+function integracaoPesos(func, n, a, b, table) result(area)
+    procedure(IFunction) :: func
+    integer :: i, n
+    real, dimension(:, :) :: table
+    real :: area, a, b, L
+    
+    area = 0
+    L = (b - a)
+    do i = 1, n
+        write(*,*) ""
+        write(*,*) "i = ", i
+        write(*,*) "W = ", table(i, 1)
+        write(*,*) "X = ", table(i, 2)
+        area = area + (table(i, 1) * func(table(i, 2)))
+    end do
+end function
+
+subroutine integracaoPolinomial(func, points, a, b, area)
+    procedure(IFunction) :: func
+    integer :: n, i
+    real :: a, b, area, L
+    real, dimension(:,:), allocatable :: table
+    character(len=*) :: points
+
+    L = (b-a)
+    table = readTable("tabelas/polinomial/" // points //".txt", n)
+    do i = 1, n
+        table(i, 1) = table(i, 1) * L
+        table(i, 2) = (a + table(i, 2) * L)
+    end do
+    area = integracaoPesos(func, n, a, b, table)
+end subroutine
+
+subroutine integracaoQuadratura(func, points, a, b, area)
+    procedure(IFunction) :: func
+    integer :: i, n
+    real :: a, b, area, L
+    real, dimension(:,:), allocatable :: table
+    character(len=*) :: points
+
+    L = (b-a)
+    table = readTable("tabelas/quadratura/" // points //".txt", n)
+    do i = 1, n
+        table(i, 2) = 1.0/2.0 * (a + b + table(i, 2)*L)
+    end do
+    area = integracaoPesos(func, n, a, b, table)
+    area = L/2 * area
+end subroutine
+
 subroutine diferencaCentral(f, x, deltaX, fLinha)
     procedure(IFunction) :: f
     real :: x, deltaX, f1, f2, fLinha
