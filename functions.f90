@@ -2,20 +2,22 @@ subroutine f(x, y)
     real x, y
     !y = x*x - 4 * cos(x)
     !y = x*x
-    !y = sin(x)
-    y = x**(1/3) + log(x)
+    y = sin(x)
+    !y = x**3 + 1/exp(x)
+    !y = x**(1/3) + log(x)
+    !y = 1 - exp(-(x/5)**2)
 
 end subroutine
 
 subroutine fL(x, y, t)
     real x, y, t
-    y = t + x
+    y = -2*t*(x**2)
 
 end subroutine
 
 subroutine fLL(x, y, t, xL)
-    real x, y, t, xL
-    y = t + x
+    real :: x, y, t, xL
+    y = - 9.81 - (1 * xL * abs(xL))
 
 end subroutine
 

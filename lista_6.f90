@@ -17,9 +17,8 @@ program lista_6
     !call rungeKutta2(xK, xZero, tZero, k, deltaT)
     !call rungeKutta4(xK, xZero, tZero, k, deltaT)
 
-    !TESTAR ESSAS DUAS
     !call taylor2(xK, xZero, xLZero, tZero, k, deltaT)
-    !call rungeKuttaNystrom(xK, xZero, xLZero, tZero, k, deltaT)
+    call rungeKuttaNystrom(xK, xZero, xLZero, tZero, k, deltaT)
 
     write (*,*) xK
 
