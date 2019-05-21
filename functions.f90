@@ -19,8 +19,6 @@ end function IJacobian
 end interface
 
 contains
->>>>>>> 6bf146be5d94cb4855036e5133e901d05492e9d5
-
 
 subroutine fL(x, y, t)
     real x, y, t
