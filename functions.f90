@@ -491,7 +491,7 @@ subroutine taylor2(f, xK, xZero, xLZero, tZero, k, deltaT)
 end subroutine
 
 
-subroutine rungeKuttaNystrom(xf, K, xZero, xLZero, tZero, k, deltaT)
+subroutine rungeKuttaNystrom(f, xK, xZero, xLZero, tZero, k, deltaT)
     procedure(IFunctionDD) :: f
     real :: xK, xZero, tZero, deltaT, xLZero, y1, y2, y3, y4
     integer :: i, k
