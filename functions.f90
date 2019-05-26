@@ -6,6 +6,15 @@ function IFunction(x) result (y)
     real             :: y
 end function IFunction
 
+function IFunctionD(x, t) result (y)
+    real, intent(in) :: x, t
+    real             :: y
+end function IFunctionD
+
+function IFunctionDD(x, t, xL) result (y)
+    real, intent(in) :: x, t, xL
+    real             :: y
+end function IFunctionDD
 
 function IFunctionMD(x) result (y)
     real, dimension(:), intent(in) :: x
@@ -412,12 +421,14 @@ subroutine interpolacaoRichard(f, x, deltaX1, deltaX2, fLinha, p)
 
 end subroutine
 
-subroutine euler(xK, xZero, tZero, k, deltaT)
+subroutine euler(f, xK, xZero, tZero, k, deltaT)
+    procedure(IFunctionD) :: f
     real :: xK, xZero, tZero, deltaT, y
     integer :: i, k
 
     do i=1, k
-        call fL(xZero, y, tZero)
+        !call fL(xZero, y, tZero)
+        y = f(xZero, tZero)
         xK = xZero + y * deltaT
         tZero = i*deltaT
         xZero = xK
@@ -425,13 +436,16 @@ subroutine euler(xK, xZero, tZero, k, deltaT)
 
 end subroutine
 
-subroutine rungeKutta2(xK, xZero, tZero, k, deltaT)
+subroutine rungeKutta2(f, xK, xZero, tZero, k, deltaT)
+    procedure(IFunctionD) :: f
     real :: xK, xZero, tZero, deltaT, y1, y2
     integer :: i, k
 
     do i=1, k
-        call fL(xZero, y1, tZero)
-        call fL(xZero+deltaT*y1, y2, tZero+deltaT)
+        !call fL(xZero, y1, tZero)
+        !call fL(xZero+deltaT*y1, y2, tZero+deltaT)
+        y1 = f(xZero, tZero)
+        y2 = f(xZero+deltaT*y1, tZero+deltaT)
         xK = xZero + (y1+y2) * deltaT/2.0
         tZero = i*deltaT
         xZero = xK
@@ -439,15 +453,20 @@ subroutine rungeKutta2(xK, xZero, tZero, k, deltaT)
 
 end subroutine
 
-subroutine rungeKutta4(xK, xZero, tZero, k, deltaT)
+subroutine rungeKutta4(f, xK, xZero, tZero, k, deltaT)
+    procedure(IFunctionD) :: f
     real :: xK, xZero, tZero, deltaT, y1, y2, y3, y4
     integer :: i, k
 
     do i=1, k
-        call fL(xZero, y1, tZero)
-        call fL(xZero+deltaT/2.0*y1, y2, tZero+deltaT/2.0)
-        call fL(xZero+deltaT/2.0*y2, y3, tZero+deltaT/2.0)
-        call fL(xZero+deltaT*y3, y4, tZero+deltaT)
+        !call fL(xZero, y1, tZero)
+        !call fL(xZero+deltaT/2.0*y1, y2, tZero+deltaT/2.0)
+        !call fL(xZero+deltaT/2.0*y2, y3, tZero+deltaT/2.0)
+        !call fL(xZero+deltaT*y3, y4, tZero+deltaT)
+        y1 = f(xZero, tZero)
+        y2 = f(xZero+deltaT/2.0*y1, tZero+deltaT/2.0)
+        y3 = f(xZero+deltaT/2.0*y2, tZero+deltaT/2.0)
+        y4 = f(xZero+deltaT*y3, tZero+deltaT)
         xK = xZero + (y1+2*y2+2*y3+y4) * deltaT/6.0
         tZero = i*deltaT
         xZero = xK
@@ -455,12 +474,14 @@ subroutine rungeKutta4(xK, xZero, tZero, k, deltaT)
 
 end subroutine
 
-subroutine taylor2(xK, xZero, xLZero, tZero, k, deltaT)
+subroutine taylor2(f, xK, xZero, xLZero, tZero, k, deltaT)
+    procedure(IFunctionDD) :: f
     real :: xK, xZero, tZero, deltaT, xLZero, x, y
     integer :: i, k
 
     do i=1, k
-        call fLL(x, y, tZero, xLZero)
+        !call fLL(xZero, y, tZero, xLZero)
+        y = f(xZero, tZero, xLZero)
         xK = xZero + xLZero*deltaT + y * (deltaT**2)/2.0
         xLZero = xLZero + y * deltaT
         tZero = i*deltaT
@@ -470,18 +491,23 @@ subroutine taylor2(xK, xZero, xLZero, tZero, k, deltaT)
 end subroutine
 
 
-subroutine rungeKuttaNystrom(xK, xZero, xLZero, tZero, k, deltaT)
+subroutine rungeKuttaNystrom(xf, K, xZero, xLZero, tZero, k, deltaT)
+    procedure(IFunctionDD) :: f
     real :: xK, xZero, tZero, deltaT, xLZero, y1, y2, y3, y4
     integer :: i, k
 
     do i=1, k
-        call fLL(xZero, y1, tZero, xLZero)
+        !call fLL(xZero, y1, tZero, xLZero)
+        y1 = f(xZero, tZero, xLZero)
         y1 = deltaT/2.0*y1
-        call fLL(xZero+xLZero+y1/2, y2, tZero+deltaT/2.0, xLZero+y1)
+        !call fLL(xZero+xLZero+y1/2, y2, tZero+deltaT/2.0, xLZero+y1)
+        y2 = f(xZero+xLZero+y1/2, tZero+deltaT/2.0, xLZero+y1)
         y2 = deltaT/2.0*y2
-        call fLL(xZero+xLZero+y1/2, y3, tZero+deltaT/2.0, xLZero+y2)
+        !call fLL(xZero+xLZero+y1/2, y3, tZero+deltaT/2.0, xLZero+y2)
+        y3 = f(xZero+xLZero+y1/2, tZero+deltaT/2.0, xLZero+y2)
         y3 = deltaT/2.0*y3
-        call fLL(xZero+deltaT*(xLZero+y3), y4, tZero+deltaT, xLZero+2*y3)
+        !call fLL(xZero+deltaT*(xLZero+y3), y4, tZero+deltaT, xLZero+2*y3)
+        y4 = f(xZero+deltaT*(xLZero+y3), tZero+deltaT, xLZero+2*y3)
         y4 = deltaT/2.0*y4
 
         xK = xZero + (xLZero + (y1+y2+y3)/3) * deltaT
