@@ -3,6 +3,8 @@ include 'functions.f90'
 
 
 program lista_6
+    use functions
+    IMPLICIT NONE
     real :: xK, xZero, tZero, deltaT, xLZero
     integer :: k
 
@@ -21,5 +23,11 @@ program lista_6
     call rungeKuttaNystrom(xK, xZero, xLZero, tZero, k, deltaT)
 
     write (*,*) xK
+
+contains
+    real function f1(x) result(y)
+        real, intent(in) :: x
+        y = x**3 + 1/exp(x)
+    end function
 
 end program lista_6
