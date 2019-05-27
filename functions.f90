@@ -42,7 +42,8 @@ subroutine fLL(x, y, t, xL)
 end subroutine
 
 subroutine bissecao(f, tol, a, b)
-    real :: f, meio, a, b, tol, delta, y
+    procedure(IFunction) ::  f
+    real :: meio, a, b, tol, delta, y
     integer :: i
 
     i = 0
@@ -307,6 +308,59 @@ subroutine metodoDeBroydenMD(func, B, tol, x, nIter)
         call inversa(J, J_1, size(J_1(1,:)))
 
         deltaX = - matmul(J_1, F)
+    end do
+    write (*,*) 'Convergencia não atingida.'
+end subroutine
+
+subroutine minimosQuadrados(func, Jac, tol, x, nIter)
+    procedure (IFunctionMD) :: func
+    procedure (IJacobian) :: Jac
+    real :: tol, tolK
+    real, dimension(:) :: x
+    real, allocatable, dimension(:) :: F, deltaX
+    real, allocatable, dimension(:,:) :: J, J_1, J_t, J_t1
+    integer :: nIter, k
+
+    allocate(deltaX, mold = x)
+    allocate(F, source = func(x))
+    write (*,*) 'F=', F
+
+    allocate(J, source = Jac(x))
+    write (*,*) 'J=', J
+
+    allocate(J_t, mold = J)
+    call transposta(J, J_t, size(J_t(1,:)))
+    write (*,*) 'J_t=', J_t
+
+    J_t1 = matmul(J_t, J)
+
+    allocate(J_1, mold = J)
+    call inversa(J_t1, J_1, size(J_1(1,:)))
+    write (*,*) 'J_1=', J_1
+
+    J = matmul(J_1, J_t)
+    deltaX = - matmul(J, F)
+
+    do k = 2, nIter
+        write (*,*) ""
+        write (*,*) 'k=', k
+        x = x + deltaX
+        tolK = euclidianModule(deltaX) / euclidianModule(x)
+
+        write (*,*) 'x=', x
+        write (*,*) 'deltaX=', deltaX
+        if (tolK.lt.tol) then
+            return
+        end if
+
+
+        F = func(x)
+        J = Jac(x)
+        call transposta(J, J_t, size(J_t(1,:)))
+        J_t1 = matmul(J_t, J)
+        call inversa(J, J_1, size(J_1(1,:)))
+        J = matmul(J_1, J_t)
+        deltaX = - matmul(J, F)
     end do
     write (*,*) 'Convergencia não atingida.'
 end subroutine
