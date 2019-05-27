@@ -1,6 +1,6 @@
 subroutine retroSubs(a, b, x, n)
     integer :: n, i, j
-    real :: a(n,n), b(n), x(n), soma
+    REAL(8) :: a(n,n), b(n), x(n), soma
 
     x(n) = b(n) / a(n, n)
     do i = n-1, 1, -1
@@ -14,7 +14,7 @@ end subroutine
 
 subroutine printMatrix(a, n, m, name)
     integer :: n, m, i, j
-    real :: a(n,n)
+    REAL(8) :: a(n,n)
     Character(len = 2) :: name
 
     print*, name, " = "
@@ -25,9 +25,9 @@ end subroutine
 
 subroutine eliminacaoGauss(a, b, x, n)
     integer :: n, i, j, k
-    real :: p(n, n), m(n, n), pivo
-    real :: aux(n)
-    real :: a(n,n), b(n), x(n), soma, mult
+    REAL(8) :: p(n, n), m(n, n), pivo
+    REAL(8) :: aux(n)
+    REAL(8) :: a(n,n), b(n), x(n), soma, mult
 
     p = 0
     call identidade(p, n)
@@ -85,7 +85,7 @@ end subroutine
 subroutine eliminacaoGaussALT(a, b, x, n)
     integer :: n, i, j, k, pivo, r
     integer :: p(n)
-    real :: a(n,n), b(n), x(n), soma, mult, aux, m(n,n), at(n,n)
+    REAL(8) :: a(n,n), b(n), x(n), soma, mult, aux, m(n,n), at(n,n)
 
     x = 0.0
 
@@ -149,7 +149,7 @@ end subroutine
 subroutine multiplicaVetorMatriz(a, b, c, n)
     !multiplicação de vetores de tamanho n
     integer :: n, i, j, k, m
-    real :: a(n), b(n), c
+    REAL(8) :: a(n), b(n), c
 
     c = 0.0
     do j=1, n
@@ -160,7 +160,7 @@ end subroutine
 
 subroutine eliminacaoGaussJordan(a, b, x, n)
     integer :: n, i, j, k
-    real :: a(n,n), b(n), x(n), mult
+    REAL(8) :: a(n,n), b(n), x(n), mult
 
     x = 0.0
 
@@ -189,7 +189,7 @@ end subroutine
 subroutine decomposicaoLU(a, b, x, n)
     integer :: n, i, j, k, pivo, r, aux
     integer :: p(n)
-    real :: a(n,n), b(n), x(n), soma, mult, y(n)
+    REAL(8) :: a(n,n), b(n), x(n), soma, mult, y(n)
 
 
     x = 0.0
@@ -256,7 +256,7 @@ end subroutine
 
 subroutine decomposicaoCholesky(a, b, x, n)
     integer :: n, i, j, k
-    real :: a(n,n), a_transposta(n,n), b(n), x(n), l(n,n), soma, y(n), u(n,n), a_soma
+    REAL(8) :: a(n,n), a_transposta(n,n), b(n), x(n), l(n,n), soma, y(n), u(n,n), a_soma
 
     x = 0.0
     y = 0.0
@@ -315,7 +315,7 @@ end subroutine
 
 subroutine determinante(a, n, det)
     integer :: n, i
-    real :: a(n,n), b(n), x(n), det
+    REAL(8) :: a(n,n), b(n), x(n), det
 
     b = 0.0
     x = 0.0
@@ -328,7 +328,7 @@ end subroutine
 
 subroutine interativoJacobi(a, b, x, n, tolerancia, k)
     integer :: n, i, j, k
-    real :: a(n,n), b(n), xZero(n), tolerancia, r, xNovo(n), xNovoT, x(n), xT, soma, linha, coluna
+    REAL(8) :: a(n,n), b(n), xZero(n), tolerancia, r, xNovo(n), xNovoT, x(n), xT, soma, linha, coluna
 
     k = 1
     r = tolerancia + 1
@@ -383,7 +383,7 @@ end subroutine
 
 subroutine GaussSeidel(a, b, x, n, tolerancia, k)
     integer :: n, i, j, k
-    real :: a(n,n), b(n), xZero(n), tolerancia, r, xNovo(n), xNovoT, x(n), xT, soma, linha, coluna
+    REAL(8) :: a(n,n), b(n), xZero(n), tolerancia, r, xNovo(n), xNovoT, x(n), xT, soma, linha, coluna
 
     k = 1
     r = 100.0
@@ -436,7 +436,7 @@ end subroutine
 
 subroutine inversa(a, aInversa, n)
     integer :: n, i, j, k, l
-    real :: a(n,n), b(n,n), x(n), mult, aInversa(n,n)
+    REAL(8) :: a(n,n), b(n,n), x(n), mult, aInversa(n,n)
 
     x = 0.0
     aInversa = 0.0
@@ -495,7 +495,7 @@ end subroutine
 
 subroutine inversaALT(a, aInversa, n)
     integer :: n, i, j, k, l
-    real :: a(n,n), b(n,n), x(n), mult, aInversa(n,n), m(n,n), at(n,n)
+    REAL(8) :: a(n,n), b(n,n), x(n), mult, aInversa(n,n), m(n,n), at(n,n)
 
     x = 0.0
     aInversa = 0.0
@@ -569,7 +569,7 @@ end subroutine
 subroutine multiplicaVetor(a, b, c, n)
     !multiplicação de vetores de tamanho n
     integer :: n, i, j, k, m
-    real :: a(n), b(n), c
+    REAL(8) :: a(n), b(n), c
 
     c = 0.0
     do j=1, n
@@ -580,7 +580,7 @@ end subroutine
 
 subroutine transposta(a, at, n)
     integer :: n
-    real :: a(n,n), at(n,n)
+    REAL(8) :: a(n,n), at(n,n)
 
     do i = 1, n
         at(i,i) = a(i,i)
@@ -593,7 +593,7 @@ end subroutine
 
 subroutine powerMethod(a, x, n, tol, lambda, k)
     integer :: n, i, k
-    real :: a(n,n), x(n), y(n), lambda, lastLambda, r, tol
+    REAL(8) :: a(n,n), x(n), y(n), lambda, lastLambda, r, tol
 
     r = tol + 1
     x = 1.0
@@ -624,7 +624,7 @@ end subroutine
 
 subroutine identidade(a, n)
     integer :: n, i
-    real :: a(n,n)
+    REAL(8) :: a(n,n)
 
     a = 0
     do i = 1, n
@@ -634,7 +634,7 @@ end subroutine
 
 subroutine jacobi(a, x, n, tol, lambda, k)
     integer :: n, i, j, k, iMax, jMax
-    real :: a(n,n), a_transposta(n,n), p(n, n), pT(n,n), x(n, n), lambda(n), tol, phi
+    REAL(8) :: a(n,n), a_transposta(n,n), p(n, n), pT(n,n), x(n, n), lambda(n), tol, phi
     logical :: done
 
     call transposta(a, a_transposta, n)
@@ -723,7 +723,7 @@ end subroutine
 
 subroutine minimosQuadrados(b, x, y, n)
     integer n, i, j
-    real b(2), x(n), y(n), a(2,2), soma, c(2), aI(2,2), det
+    REAL(8) b(2), x(n), y(n), a(2,2), soma, c(2), aI(2,2), det
 
     b = 0.0
     soma = 0.0

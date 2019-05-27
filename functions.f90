@@ -2,54 +2,46 @@ module functions
 implicit none
 interface
 function IFunction(x) result (y)
-    real, intent(in) :: x
-    real             :: y
+    REAL(8), intent(in) :: x
+    REAL(8)             :: y
 end function IFunction
 
 function IFunctionD(x, t) result (y)
-    real, intent(in) :: x, t
-    real             :: y
+    REAL(8), intent(in) :: x, t
+    REAL(8)             :: y
 end function IFunctionD
 
 function IFunctionDD(x, t, xL) result (y)
-    real, intent(in) :: x, t, xL
-    real             :: y
+    REAL(8), intent(in) :: x, t, xL
+    REAL(8)             :: y
 end function IFunctionDD
 
 function IFunctionMD(x) result (y)
-    real, dimension(:), intent(in) :: x
-    real, allocatable, dimension(:) :: y
+    REAL(8), dimension(:), intent(in) :: x
+    REAL(8), allocatable, dimension(:) :: y
 end function IFunctionMD
 
 function IJacobian(x) result (y)
-    real, dimension(:), intent(in) :: x
-    real, allocatable, dimension(:,:) :: y
+    REAL(8), dimension(:), intent(in) :: x
+    REAL(8), allocatable, dimension(:,:) :: y
 end function IJacobian
 end interface
 
 contains
 
-subroutine fL(x, y, t)
-    real x, y, t
-    y = -2*t*(x**2)
-
-end subroutine
-
-subroutine fLL(x, y, t, xL)
-    real :: x, y, t, xL
-    y = - 9.81 - (1 * xL * abs(xL))
-
-end subroutine
-
 subroutine bissecao(f, tol, a, b)
     procedure(IFunction) ::  f
-    real :: meio, a, b, tol, delta, y
+    REAL(8) :: meio, a, b, tol, delta, y
     integer :: i
 
     i = 0
-    do while (abs(b-a) > tol)
-        meio = (a+b) / 2.0
+    do while (abs(b - a) > tol)
+        write (*,*) ""
+        write (*,*) "k=", i
+        meio = (a + b) / 2.0
+        write (*,*) "meio=", meio
         y = f(meio)
+        write (*,*) "y=", y
         if (y >= 0) then
             b = meio
         else
@@ -60,12 +52,13 @@ subroutine bissecao(f, tol, a, b)
     write (*,*) i
     a = meio
     b = meio
+    write (*,*) a
 
 end subroutine
 
 subroutine metodoDeNewtonOriginal(func, dfunc, tol, x0, nIter, a)
     procedure(IFunction) :: func, dfunc
-    real :: tol, x0, xK, xK_1, f, df, tolK, a
+    REAL(8) :: tol, x0, xK, xK_1, f, df, tolK, a
     integer :: nIter, k
 
     xK_1 = x0
@@ -93,7 +86,7 @@ end subroutine
 
 subroutine metodoDeNewtonSecante(func, tol, x0, nIter, deltaX, a)
     procedure(IFunction) :: func
-    real :: tol, x0, xK, xK_1, xK_p1, tolK, a, fA, fI, deltaX
+    REAL(8) :: tol, x0, xK, xK_1, xK_p1, tolK, a, fA, fI, deltaX
     integer :: nIter, k
 
     fA = func(x0)
@@ -130,14 +123,14 @@ end subroutine
 
 subroutine interpolacaoInversa(func, tol, nIter, a, x)
     procedure(IFunction) :: func
-    real, intent(in) :: tol
+    REAL(8), intent(in) :: tol
     integer, intent(in) :: nIter
 
-    real, dimension(3) :: x, y, auxX
-    real :: xK, xK_1, tolK, aux
+    REAL(8), dimension(3) :: x, y, auxX
+    REAL(8) :: xK, xK_1, tolK, aux
     integer :: k, i, j
 
-    real, intent(out) :: a
+    REAL(8), intent(out) :: a
 
 
     xK_1 = 10E+36
@@ -186,8 +179,8 @@ subroutine interpolacaoInversa(func, tol, nIter, a, x)
     write (*,*) 'Convergencia não atingida.'
 end subroutine
 
-real function euclidianModule(A)
-    real, dimension(:) :: A
+REAL(8) function euclidianModule(A)
+    REAL(8), dimension(:) :: A
     integer :: i, j
 
     do i = 1, size(A)
@@ -199,10 +192,10 @@ end function
 subroutine metodoDeNewtonMD(func, Jac, tol, x, nIter)
     procedure (IFunctionMD) :: func
     procedure (IJacobian) :: Jac
-    real :: tol, tolK
-    real, dimension(:) :: x
-    real, allocatable, dimension(:) :: F, deltaX
-    real, allocatable, dimension(:,:) :: J, J_1
+    REAL(8) :: tol, tolK
+    REAL(8), dimension(:) :: x
+    REAL(8), allocatable, dimension(:) :: F, deltaX
+    REAL(8), allocatable, dimension(:,:) :: J, J_1
     integer :: nIter, k
 
     allocate(deltaX, mold = x)
@@ -241,8 +234,8 @@ subroutine metodoDeNewtonMD(func, Jac, tol, x, nIter)
 end subroutine
 
 function transposeVector(v) result(vT)
-    real, dimension(:), intent(in) :: v
-    real, allocatable, dimension(:,:) :: vT
+    REAL(8), dimension(:), intent(in) :: v
+    REAL(8), allocatable, dimension(:,:) :: vT
     integer :: i
     allocate(vT(1, size(v)))
 
@@ -253,11 +246,11 @@ end function
 
 subroutine metodoDeBroydenMD(func, B, tol, x, nIter)
     procedure (IFunctionMD) :: func
-    real :: tol, tolK
-    real, dimension(:) :: x
-    real, dimension(:,:) :: B
-    real, allocatable, dimension(:) :: F, deltaX, Y
-    real, allocatable, dimension(:,:) :: J, B_1, J_1, deltaX_T
+    REAL(8) :: tol, tolK
+    REAL(8), dimension(:) :: x
+    REAL(8), dimension(:,:) :: B
+    REAL(8), allocatable, dimension(:) :: F, deltaX, Y
+    REAL(8), allocatable, dimension(:,:) :: J, B_1, J_1, deltaX_T
     integer :: nIter, k
 
     allocate(deltaX, mold = x)
@@ -315,10 +308,10 @@ end subroutine
 subroutine minimosQuadrados(func, Jac, tol, x, nIter)
     procedure (IFunctionMD) :: func
     procedure (IJacobian) :: Jac
-    real :: tol, tolK
-    real, dimension(:) :: x
-    real, allocatable, dimension(:) :: F, deltaX
-    real, allocatable, dimension(:,:) :: J, J_1, J_t, J_t1
+    REAL(8) :: tol, tolK
+    REAL(8), dimension(:) :: x
+    REAL(8), allocatable, dimension(:) :: F, deltaX
+    REAL(8), allocatable, dimension(:,:) :: J, J_1, J_t, J_t1
     integer :: nIter, k
 
     allocate(deltaX, mold = x)
@@ -367,7 +360,7 @@ end subroutine
 
 function readTable(fileName, n) result(table)
     Character(len=*) :: fileName
-    real, dimension(:,:), allocatable :: table
+    REAL(8), dimension(:,:), allocatable :: table
     integer :: i, j
     integer, intent(out) :: n
 
@@ -383,8 +376,8 @@ end function
 function integracaoPesos(func, n, a, b, table) result(area)
     procedure(IFunction) :: func
     integer :: i, n
-    real, dimension(:, :) :: table
-    real :: area, a, b, L
+    REAL(8), dimension(:, :) :: table
+    REAL(8) :: area, a, b, L
 
     area = 0
     L = (b - a)
@@ -400,8 +393,8 @@ end function
 subroutine integracaoPolinomial(func, points, a, b, area)
     procedure(IFunction) :: func
     integer :: n, i
-    real :: a, b, area, L
-    real, dimension(:,:), allocatable :: table
+    REAL(8) :: a, b, area, L
+    REAL(8), dimension(:,:), allocatable :: table
     character(len=*) :: points
 
     L = (b-a)
@@ -416,8 +409,8 @@ end subroutine
 subroutine integracaoQuadratura(func, points, a, b, area)
     procedure(IFunction) :: func
     integer :: i, n
-    real :: a, b, area, L
-    real, dimension(:,:), allocatable :: table
+    REAL(8) :: a, b, area, L
+    REAL(8), dimension(:,:), allocatable :: table
     character(len=*) :: points
 
     L = (b-a)
@@ -431,7 +424,7 @@ end subroutine
 
 subroutine diferencaCentral(f, x, deltaX, fLinha)
     procedure(IFunction) :: f
-    real :: x, deltaX, f1, f2, fLinha
+    REAL(8) :: x, deltaX, f1, f2, fLinha
 
     f1 = f(x+deltaX)
     f2 = f(x-deltaX)
@@ -442,7 +435,7 @@ end subroutine
 
 subroutine passoFrente(f, x, deltaX, fLinha)
     procedure(IFunction) :: f
-    real :: x, deltaX, f1, f2, fLinha
+    REAL(8) :: x, deltaX, f1, f2, fLinha
 
     f1 = f(x+deltaX)
     f2 = f(x)
@@ -453,7 +446,7 @@ end subroutine
 
 subroutine passoTras(f, x, deltaX, fLinha)
     procedure(IFunction) :: f
-    real :: x, deltaX, f1, f2, fLinha
+    REAL(8) :: x, deltaX, f1, f2, fLinha
 
     f1 = f(x)
     f2 = f(x-deltaX)
@@ -464,7 +457,7 @@ end subroutine
 
 subroutine interpolacaoRichard(f, x, deltaX1, deltaX2, fLinha, p)
     procedure(IFunction) :: f
-    real :: x, deltaX1, deltaX2, d1, d2, q, fLinha, p
+    REAL(8) :: x, deltaX1, deltaX2, d1, d2, q, fLinha, p
 
     q = deltaX1/deltaX2
 
@@ -477,7 +470,7 @@ end subroutine
 
 subroutine euler(f, xK, xZero, tZero, k, deltaT)
     procedure(IFunctionD) :: f
-    real :: xK, xZero, tZero, deltaT, y
+    REAL(8) :: xK, xZero, tZero, deltaT, y
     integer :: i, k
 
     !do i=1, k
@@ -502,7 +495,7 @@ end subroutine
 
 subroutine rungeKutta2(f, xK, xZero, tZero, k, deltaT)
     procedure(IFunctionD) :: f
-    real :: xK, xZero, tZero, deltaT, y1, y2
+    REAL(8) :: xK, xZero, tZero, deltaT, y1, y2
     integer :: i, k
 
     !do i=1, k
@@ -531,7 +524,7 @@ end subroutine
 
 subroutine rungeKutta4(f, xK, xZero, tZero, k, deltaT)
     procedure(IFunctionD) :: f
-    real :: xK, xZero, tZero, deltaT, y1, y2, y3, y4
+    REAL(8) :: xK, xZero, tZero, deltaT, y1, y2, y3, y4
     integer :: i, k
 
     !do i=1, k
@@ -565,7 +558,7 @@ end subroutine
 
 subroutine taylor2(f, xK, xZero, xLZero, tZero, k, deltaT)
     procedure(IFunctionDD) :: f
-    real :: xK, xZero, tZero, deltaT, xLZero, x, y
+    REAL(8) :: xK, xZero, tZero, deltaT, xLZero, x, y
     integer :: i, k
 
     !do i=1, k
@@ -591,7 +584,7 @@ end subroutine
 
 subroutine rungeKuttaNystrom(f, xK, xZero, xLZero, tZero, k, deltaT)
     procedure(IFunctionDD) :: f
-    real :: xK, xZero, tZero, deltaT, xLZero, y1, y2, y3, y4
+    REAL(8) :: xK, xZero, tZero, deltaT, xLZero, y1, y2, y3, y4
     integer :: i, k
 
     !do i=1, k
