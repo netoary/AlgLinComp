@@ -426,14 +426,24 @@ subroutine euler(f, xK, xZero, tZero, k, deltaT)
     real :: xK, xZero, tZero, deltaT, y
     integer :: i, k
 
-    do i=1, k
+    !do i=1, k
+        !call fL(xZero, y, tZero)
+    !    y = f(xZero, tZero)
+    !    xK = xZero + y * deltaT
+    !    tZero = i*deltaT
+    !    xZero = xK
+        !write(*,*) tZero
+    !end do
+
+    i = 1
+    do while (tZero<k)
         !call fL(xZero, y, tZero)
         y = f(xZero, tZero)
         xK = xZero + y * deltaT
         tZero = i*deltaT
         xZero = xK
+        i = i + 1
     end do
-
 end subroutine
 
 subroutine rungeKutta2(f, xK, xZero, tZero, k, deltaT)
@@ -441,7 +451,18 @@ subroutine rungeKutta2(f, xK, xZero, tZero, k, deltaT)
     real :: xK, xZero, tZero, deltaT, y1, y2
     integer :: i, k
 
-    do i=1, k
+    !do i=1, k
+        !call fL(xZero, y1, tZero)
+        !call fL(xZero+deltaT*y1, y2, tZero+deltaT)
+    !    y1 = f(xZero, tZero)
+    !    y2 = f(xZero+deltaT*y1, tZero+deltaT)
+    !    xK = xZero + (y1+y2) * deltaT/2.0
+    !    tZero = i*deltaT
+    !    xZero = xK
+    !    write(*,*) tZero
+    !end do
+    i = 1
+    do while (tZero<k)
         !call fL(xZero, y1, tZero)
         !call fL(xZero+deltaT*y1, y2, tZero+deltaT)
         y1 = f(xZero, tZero)
@@ -449,6 +470,7 @@ subroutine rungeKutta2(f, xK, xZero, tZero, k, deltaT)
         xK = xZero + (y1+y2) * deltaT/2.0
         tZero = i*deltaT
         xZero = xK
+        i = i + 1
     end do
 
 end subroutine
@@ -458,11 +480,24 @@ subroutine rungeKutta4(f, xK, xZero, tZero, k, deltaT)
     real :: xK, xZero, tZero, deltaT, y1, y2, y3, y4
     integer :: i, k
 
-    do i=1, k
+    !do i=1, k
         !call fL(xZero, y1, tZero)
         !call fL(xZero+deltaT/2.0*y1, y2, tZero+deltaT/2.0)
         !call fL(xZero+deltaT/2.0*y2, y3, tZero+deltaT/2.0)
         !call fL(xZero+deltaT*y3, y4, tZero+deltaT)
+    !    y1 = f(xZero, tZero)
+    !    y2 = f(xZero+deltaT/2.0*y1, tZero+deltaT/2.0)
+    !    y3 = f(xZero+deltaT/2.0*y2, tZero+deltaT/2.0)
+    !    y4 = f(xZero+deltaT*y3, tZero+deltaT)
+    !    xK = xZero + (y1+2*y2+2*y3+y4) * deltaT/6.0
+    !    tZero = i*deltaT
+    !    xZero = xK
+        !write(*,*) tZero
+    !end do
+
+
+    i = 1
+    do while (tZero<k)
         y1 = f(xZero, tZero)
         y2 = f(xZero+deltaT/2.0*y1, tZero+deltaT/2.0)
         y3 = f(xZero+deltaT/2.0*y2, tZero+deltaT/2.0)
@@ -470,8 +505,8 @@ subroutine rungeKutta4(f, xK, xZero, tZero, k, deltaT)
         xK = xZero + (y1+2*y2+2*y3+y4) * deltaT/6.0
         tZero = i*deltaT
         xZero = xK
+        i = i + 1
     end do
-
 end subroutine
 
 subroutine taylor2(f, xK, xZero, xLZero, tZero, k, deltaT)
@@ -479,15 +514,24 @@ subroutine taylor2(f, xK, xZero, xLZero, tZero, k, deltaT)
     real :: xK, xZero, tZero, deltaT, xLZero, x, y
     integer :: i, k
 
-    do i=1, k
+    !do i=1, k
         !call fLL(xZero, y, tZero, xLZero)
+    !    y = f(xZero, tZero, xLZero)
+    !    xK = xZero + xLZero*deltaT + y * (deltaT**2)/2.0
+    !    xLZero = xLZero + y * deltaT
+    !    tZero = i*deltaT
+    !    xZero = xK
+    !end do
+
+    i = 1
+    do while (tZero<k)
         y = f(xZero, tZero, xLZero)
         xK = xZero + xLZero*deltaT + y * (deltaT**2)/2.0
         xLZero = xLZero + y * deltaT
         tZero = i*deltaT
         xZero = xK
+        i = i + 1
     end do
-
 end subroutine
 
 
@@ -496,8 +540,28 @@ subroutine rungeKuttaNystrom(f, xK, xZero, xLZero, tZero, k, deltaT)
     real :: xK, xZero, tZero, deltaT, xLZero, y1, y2, y3, y4
     integer :: i, k
 
-    do i=1, k
+    !do i=1, k
         !call fLL(xZero, y1, tZero, xLZero)
+    !    y1 = f(xZero, tZero, xLZero)
+    !    y1 = deltaT/2.0*y1
+        !call fLL(xZero+xLZero+y1/2, y2, tZero+deltaT/2.0, xLZero+y1)
+    !    y2 = f(xZero+xLZero+y1/2, tZero+deltaT/2.0, xLZero+y1)
+    !    y2 = deltaT/2.0*y2
+        !call fLL(xZero+xLZero+y1/2, y3, tZero+deltaT/2.0, xLZero+y2)
+    !    y3 = f(xZero+xLZero+y1/2, tZero+deltaT/2.0, xLZero+y2)
+    !    y3 = deltaT/2.0*y3
+        !call fLL(xZero+deltaT*(xLZero+y3), y4, tZero+deltaT, xLZero+2*y3)
+    !    y4 = f(xZero+deltaT*(xLZero+y3), tZero+deltaT, xLZero+2*y3)
+    !    y4 = deltaT/2.0*y4
+
+    !    xK = xZero + (xLZero + (y1+y2+y3)/3) * deltaT
+    !    xLZero = xLZero + (y1 + 2*y2 + 2*y3 + y4)/3
+    !    tZero = i*deltaT
+    !    xZero = xK
+    !end do
+
+    i = 1
+    do while (tZero<k)
         y1 = f(xZero, tZero, xLZero)
         y1 = deltaT/2.0*y1
         !call fLL(xZero+xLZero+y1/2, y2, tZero+deltaT/2.0, xLZero+y1)
@@ -514,8 +578,8 @@ subroutine rungeKuttaNystrom(f, xK, xZero, xLZero, tZero, k, deltaT)
         xLZero = xLZero + (y1 + 2*y2 + 2*y3 + y4)/3
         tZero = i*deltaT
         xZero = xK
+        i = i + 1
     end do
-
 end subroutine
 
 end module functions
