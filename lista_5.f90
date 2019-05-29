@@ -8,16 +8,18 @@ program lista_5
     REAL(8) :: area
 
     a = 0
-    b = 10
+    b = 5
     
-    call integracaoQuadratura(f1, "10", a, b, area)
+    call integracaoPolinomial(f1, "7", a, b, area)
 
     write (*,*) area
     call sleep(10000)
 
 contains
-    REAL(8) function f1(x) result(y)
-        REAL(8), intent(in) :: x
-        y = x
-    end function
+REAL(8) function f1(x) result(y)
+    REAL(8), intent(in) :: x
+    REAL, PARAMETER :: Pi = 3.1415927
+    y = 1/sqrt(2*Pi) * exp(-1.0d0/2.0d0 * x**2)
+end function
+
 end program lista_5
