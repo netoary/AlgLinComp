@@ -4,8 +4,8 @@ include 'functions.f90'
 program lista_5
     use functions
     IMPLICIT NONE
-    real :: a, b
-    real :: area
+    REAL(8) :: a, b
+    REAL(8) :: area
 
     a = 0
     b = 10
@@ -16,8 +16,8 @@ program lista_5
     call sleep(10000)
 
 contains
-    real function f1(x) result(y)
-        real, intent(in) :: x
+    REAL(8) function f1(x) result(y)
+        REAL(8), intent(in) :: x
         y = x
     end function
 end program lista_5

@@ -39,7 +39,7 @@ subroutine eliminacaoGauss(a, b, x, n)
         pivo = a(k,k)
         if (pivo == 0.0) then
             print *, k, k, pivo, a(k,k)
-            call sleep(100)
+            !call sleep(100)
             call identidade(p, n)
             do i= k+1, n
                 if(a(i,k)==0) then
@@ -131,7 +131,7 @@ subroutine eliminacaoGaussALT(a, b, x, n)
             m(i,k) = -a(i,k)/a(k,k)
             !m(k,i) = -a(k,i)/a(k,k)
         end do
-        write(*,*) m
+        !write(*,*) m
         !write(*,*) a
         !write(*,*) b
 
@@ -164,7 +164,7 @@ subroutine eliminacaoGaussJordan(a, b, x, n)
 
     x = 0.0
 
-    call eliminacaoGaussALT(a, b, x, n)
+    call eliminacaoGauss(a, b, x, n)
 
     do k = n, 2, -1
 

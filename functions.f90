@@ -179,7 +179,7 @@ subroutine interpolacaoInversa(func, tol, nIter, a, x)
     write (*,*) 'Convergencia não atingida.'
 end subroutine
 
-REAL(8) function euclidianModule(A)
+REAL(4) function euclidianModule(A)
     REAL(8), dimension(:) :: A
     integer :: i, j
 
@@ -189,46 +189,165 @@ REAL(8) function euclidianModule(A)
     euclidianModule = sqrt(euclidianModule)
 end function
 
+function invert(a) result(a_1)
+    REAL(8), dimension(:,:), intent(in) :: a
+    REAL(8), dimension(:,:), allocatable :: a_1
+    integer :: n
+    
+    allocate(a_1, mold = a)
+    n = size(a(1,:))
+    call matrixinv(a, a_1, n)
+    !a_1 = TRANSPOSE(a_1)
+end function
+
+subroutine matrixinv(a,b,n)
+    ! subroutine to calculate the inverse of a matrix using Gauss-Jordan elimination
+    ! the inverse of matrix a(n,n) is calculated and stored in the matrix b(n,n)
+    integer :: i,j,k,l,m,n,irow
+    
+    real(8):: big,a(n,n),b(n,n),dum
+
+
+        
+    !build the identity matrix
+    do i = 1,n 
+        do j = 1,n
+            b(i,j) = 0.0
+        end do
+        
+        b(i,i) = 1.0
+        end do
+    do i = 1,n ! this is the big loop over all the columns of a(n,n)
+        
+    ! in case the entry a(i,i) is zero, we need to find a good pivot; this pivot
+        
+        ! is chosen as the largest value on the column i from a(j,i) with j = 1,n
+        
+        big = a(i,i)
+    do j = i,n
+        
+        if (a(j,i).gt.big) then
+        
+        big = a(j,i)
+        
+    irow = j
+        end if
+        end do
+        
+    ! interchange lines i with irow for both a() and b() matrices
+        
+    if (big.gt.a(i,i)) then
+        
+        do k = 1,n
+        
+        dum = a(i,k) ! matrix a()
+        
+    a(i,k) = a(irow,k)
+        
+    a(irow,k) = dum
+        
+    dum = b(i,k) ! matrix b()
+        
+    b(i,k) = b(irow,k)
+        
+    b(irow,k) = dum
+        end do
+        end if
+        
+    ! divide all entries in line i from a(i,j) by the value a(i,i);
+        
+    ! same operation for the identity matrix
+        
+    dum = a(i,i)
+        
+    do j = 1,n
+        
+        a(i,j) = a(i,j)/dum
+        
+    b(i,j) = b(i,j)/dum
+        end do
+        
+    ! make zero all entries in the column a(j,i); same operation for indent()
+        
+    do j = i+1,n
+        
+        dum = a(j,i)
+        
+    do k = 1,n
+        
+        a(j,k) = a(j,k) - dum*a(i,k)
+        
+    b(j,k) = b(j,k) - dum*b(i,k)
+        end do
+        
+    end do
+        
+    end do
+        
+        
+        
+    ! substract appropiate multiple of row j from row j-1
+        
+    do i = 1,n-1
+        
+        do j = i+1,n
+        
+        dum = a(i,j)
+        
+    do l = 1,n
+        
+        a(i,l) = a(i,l)-dum*a(j,l)
+        
+    b(i,l) = b(i,l)-dum*b(j,l)
+        
+    end do
+        
+    end do
+    
+end do
+end subroutine
+    
+
+
+
 subroutine metodoDeNewtonMD(func, Jac, tol, x, nIter)
     procedure (IFunctionMD) :: func
     procedure (IJacobian) :: Jac
-    REAL(8) :: tol, tolK
+    REAL(4) :: tol, tolK, a, b
     REAL(8), dimension(:) :: x
     REAL(8), allocatable, dimension(:) :: F, deltaX
     REAL(8), allocatable, dimension(:,:) :: J, J_1
     integer :: nIter, k
 
+    tolK = 0
     allocate(deltaX, mold = x)
     allocate(F, source = func(x))
-    write (*,*) 'F=', F
-
     allocate(J, source = Jac(x))
-    write (*,*) 'J=', J
-
     allocate(J_1, mold = J)
-    call inversa(J, J_1, size(J_1(1,:)))
-    write (*,*) 'J_1=', J_1
 
-    deltaX = - matmul(J_1, F)
-
-    do k = 2, nIter
+    do k = 1, nIter
         write (*,*) ""
         write (*,*) 'k=', k
-        x = x + deltaX
-        tolK = euclidianModule(deltaX) / euclidianModule(x)
-
+        write (*,*) 'F=', F
+        write (*,*) 'J=', J
+        J_1 = invert(J)
+        write (*,*) 'J_1=', J_1
+        deltaX = - matmul(J_1, F)
         write (*,*) 'x=', x
         write (*,*) 'deltaX=', deltaX
+        b = euclidianModule(deltaX)
+        a = euclidianModule(x)
+        tolK = b / a
+
+        write (*,*) 'tolK=', tolK, ' - mod(deltaX) = ', b, ' - mod(x) = ', a
         if (tolK.lt.tol) then
             return
         end if
 
 
+        x = x + deltaX
         F = func(x)
         J = Jac(x)
-        call inversa(J, J_1, size(J_1(1,:)))
-
-        deltaX = - matmul(J_1, F)
     end do
     write (*,*) 'Convergencia não atingida.'
 end subroutine
@@ -246,7 +365,7 @@ end function
 
 subroutine metodoDeBroydenMD(func, B, tol, x, nIter)
     procedure (IFunctionMD) :: func
-    REAL(8) :: tol, tolK
+    REAL(4) :: tol, tolK
     REAL(8), dimension(:) :: x
     REAL(8), dimension(:,:) :: B
     REAL(8), allocatable, dimension(:) :: F, deltaX, Y
@@ -261,29 +380,29 @@ subroutine metodoDeBroydenMD(func, B, tol, x, nIter)
     allocate(J_1, mold = J)
     allocate(deltaX_T(1, size(deltaX)))
 
-    x = x + deltaX
     write (*,*) 'b=', B
-    do k = 2, nIter
+    do k = 1, nIter
         write (*,*) ""
         write (*,*) 'k=', k
 
 
         write (*,*) 'F=', F
         write (*,*) 'J=', J
-        call inversa(J, J_1, size(J_1(1,:)))
+        J_1 = invert(J)
         write (*,*) 'J_1=', J_1
 
         deltaX = - matmul(J_1, F)
+        write (*,*) 'X=', x
         write (*,*) 'deltaX=', deltaX
 
         x = x + deltaX
-        write (*,*) 'x=', x
+        write (*,*) 'newX=', x
         Y = func(x) - F
-        write (*,*) 'Y=', Y
+        write (*,*) 'Y=', Y!, '- func = ', func(x), ' - F = ',F
 
         tolK = euclidianModule(deltaX) / euclidianModule(x)
 
-        write (*,*) 'tolK=', tolK, ",", euclidianModule(deltaX), ",", euclidianModule(x)
+        write (*,*) 'tolK=', tolK!, ",", euclidianModule(deltaX), ",", euclidianModule(x)
         if (tolK.lt.tol) then
             return
         else
