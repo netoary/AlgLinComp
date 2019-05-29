@@ -193,7 +193,7 @@ function invert(a) result(a_1)
     REAL(8), dimension(:,:), intent(in) :: a
     REAL(8), dimension(:,:), allocatable :: a_1
     integer :: n
-    
+
     allocate(a_1, mold = a)
     n = size(a(1,:))
     call matrixinv(a, a_1, n)
@@ -204,109 +204,109 @@ subroutine matrixinv(a,b,n)
     ! subroutine to calculate the inverse of a matrix using Gauss-Jordan elimination
     ! the inverse of matrix a(n,n) is calculated and stored in the matrix b(n,n)
     integer :: i,j,k,l,m,n,irow
-    
+
     real(8):: big,a(n,n),b(n,n),dum
 
 
-        
+
     !build the identity matrix
-    do i = 1,n 
+    do i = 1,n
         do j = 1,n
             b(i,j) = 0.0
         end do
-        
+
         b(i,i) = 1.0
         end do
     do i = 1,n ! this is the big loop over all the columns of a(n,n)
-        
+
     ! in case the entry a(i,i) is zero, we need to find a good pivot; this pivot
-        
+
         ! is chosen as the largest value on the column i from a(j,i) with j = 1,n
-        
+
         big = a(i,i)
     do j = i,n
-        
+
         if (a(j,i).gt.big) then
-        
+
         big = a(j,i)
-        
+
     irow = j
         end if
         end do
-        
+
     ! interchange lines i with irow for both a() and b() matrices
-        
+
     if (big.gt.a(i,i)) then
-        
+
         do k = 1,n
-        
+
         dum = a(i,k) ! matrix a()
-        
+
     a(i,k) = a(irow,k)
-        
+
     a(irow,k) = dum
-        
+
     dum = b(i,k) ! matrix b()
-        
+
     b(i,k) = b(irow,k)
-        
+
     b(irow,k) = dum
         end do
         end if
-        
+
     ! divide all entries in line i from a(i,j) by the value a(i,i);
-        
+
     ! same operation for the identity matrix
-        
+
     dum = a(i,i)
-        
+
     do j = 1,n
-        
+
         a(i,j) = a(i,j)/dum
-        
+
     b(i,j) = b(i,j)/dum
         end do
-        
+
     ! make zero all entries in the column a(j,i); same operation for indent()
-        
+
     do j = i+1,n
-        
+
         dum = a(j,i)
-        
+
     do k = 1,n
-        
+
         a(j,k) = a(j,k) - dum*a(i,k)
-        
+
     b(j,k) = b(j,k) - dum*b(i,k)
         end do
-        
+
     end do
-        
+
     end do
-        
-        
-        
+
+
+
     ! substract appropiate multiple of row j from row j-1
-        
+
     do i = 1,n-1
-        
+
         do j = i+1,n
-        
+
         dum = a(i,j)
-        
+
     do l = 1,n
-        
+
         a(i,l) = a(i,l)-dum*a(j,l)
-        
+
     b(i,l) = b(i,l)-dum*b(j,l)
-        
+
     end do
-        
+
     end do
-    
+
 end do
 end subroutine
-    
+
 
 
 
@@ -335,6 +335,8 @@ subroutine metodoDeNewtonMD(func, Jac, tol, x, nIter)
         deltaX = - matmul(J_1, F)
         write (*,*) 'x=', x
         write (*,*) 'deltaX=', deltaX
+        x = x + deltaX
+
         b = euclidianModule(deltaX)
         a = euclidianModule(x)
         tolK = b / a
@@ -344,8 +346,6 @@ subroutine metodoDeNewtonMD(func, Jac, tol, x, nIter)
             return
         end if
 
-
-        x = x + deltaX
         F = func(x)
         J = Jac(x)
     end do
@@ -441,13 +441,14 @@ subroutine minimosQuadrados(func, Jac, tol, x, nIter)
     write (*,*) 'J=', J
 
     allocate(J_t, mold = J)
+    allocate(J_t1, mold = J)
     call transposta(J, J_t, size(J_t(1,:)))
     write (*,*) 'J_t=', J_t
 
     J_t1 = matmul(J_t, J)
 
     allocate(J_1, mold = J)
-    call inversa(J_t1, J_1, size(J_1(1,:)))
+    J_1 = invert(J)
     write (*,*) 'J_1=', J_1
 
     J = matmul(J_1, J_t)

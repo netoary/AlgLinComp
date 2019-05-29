@@ -7,7 +7,7 @@ program lista_4
     REAL(8) :: a, b
     REAL(4) :: tol
     REAL(8), dimension(2) :: x
-    ! REAL(8) :: a(3,3), b(3)
+    REAL(8) :: c(3,3), ci(3,3)
 
 
     !TESTE SLIDE
@@ -43,8 +43,8 @@ program lista_4
 
     !Questão 3
     tol = 1E-4
-    x = [2,3]
-    !call metodoDeNewtonMD(f3, J3, tol, x, 100)
+    x = [2,5]
+    call metodoDeNewtonMD(f3, J3, tol, x, 100)
 
     ! a(1,:) = [0.008333333333333333d0, -0.14166666666666666d0, 0.25d0]
     ! a(2,:) = [0.008333333333333333d0, 0.10833333333333334d0, -0.25d0]
@@ -53,8 +53,9 @@ program lista_4
     ! write (*,*) a
     ! x = matmul(a, b)
 
-    call metodoDeBroydenMD(f3_, J2(x), tol, x, 20)
+    !call metodoDeBroydenMD(f3_, J2(x), tol, x, 20)
     !call minimosQuadrados(fQ, JQ, tol, x, 100)
+
     write (*,*) x
 
     call sleep(10000)
@@ -74,7 +75,7 @@ contains
     REAL(8) function f1(x) result(y)
         REAL(8), intent(in) :: x
         REAL(8) :: g, k
-        
+
         g = 9.806
         k = 0.00341
         y = log10(cosh(x * sqrt(g * k))) - 50.0
@@ -95,7 +96,7 @@ contains
         y = 4*(-sin(x))-2*exp(2*x)
     end function
 
-    
+
     function f3_(inputs) result(funcs)
         REAL(8), dimension(:), intent(in) :: inputs
         REAL(8), allocatable, dimension(:) :: funcs
@@ -104,7 +105,7 @@ contains
 
         x = inputs(1)
         y = inputs(2)
-        
+
         allocate(funcs(2))
         funcs(1) = x + 2*y -2
         funcs(2) = x**2 + 4*y**2 -4
@@ -119,7 +120,7 @@ contains
         x = inputs(1)
         y = inputs(2)
         z = inputs(3)
-        
+
         allocate(funcs(3))
         funcs(1) = 16.0d0 * x**4 + 16 * y**4 + z**4 - 16
         funcs(2) = x**2 + y**2 + z**2 - 3.0d0
@@ -135,16 +136,16 @@ contains
         x = inputs(1)
         y = inputs(2)
         z = inputs(3)
-        
+
         allocate(J(3,3))
         J(1,1) = 64 * (x**3)
         J(2,1) = 64 * (y**3)
         J(3,1) = 4 * (z**3)
-        
+
         J(1,2) = 2 * x
         J(2,2) = 2 * y
         J(3,2) = 2 * z
-        
+
         J(1,3) = 3 * x**2
         J(2,3) = -1
         J(3,3) = 1
@@ -152,11 +153,11 @@ contains
         ! J(1,1) = 64 * (x**3)
         ! J(1,2) = 64 * (y**3)
         ! J(1,3) = 4 * (z**3)
-        
+
         ! J(2,1) = 2 * x
         ! J(2,2) = 2 * y
         ! J(2,3) = 2 * z
-        
+
         ! J(3,1) = 3 * x**2
         ! J(3,2) = -1
         ! J(3,3) = 1
